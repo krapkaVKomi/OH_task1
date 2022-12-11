@@ -1,0 +1,60 @@
+{% extends 'main/base.html' %}
+{% block title %}
+find all
+{% endblock %}
+
+{% block content %}
+<br>
+<form method="GET" >
+    <div class="input-field">
+        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search Here...">
+       <button class="btn" type="submit" name="action">Search</button>
+    </div>
+</form>
+<hr>
+
+{% for item in posts %}
+<div class="row mb-3 text-center">
+      <div class="col-md-8 themed-grid-col">
+        <div class="pb-3">
+           <h4>Назва принтера: {{ item.name }} </h4>
+        </div>
+        <div class="row">
+          <div class="col-md-6 themed-grid-col">Ключ доступу до API: {{ item.api_key }}</div>
+          <div class="col-md-6 themed-grid-col">Чек для клієнта?: {{ item.check_type }}</div>
+        </div>
+      </div>
+      <div class="col-md-4 themed-grid-col">ID принтера: {{ item.point_id }}</div>
+    </div><hr>
+{% endfor %}
+
+{% if posts.has_other_pages %}
+    <ul class="pagination">
+        {% if posts.has_previous %}
+            <li class="waves-effect"><a href="?page=
+                    {{ posts.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
+                    class="material-icons">chevron_left</i></a></li>
+        {% else %}
+            <li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
+        {% endif %}
+        {% for num in posts.paginator.page_range %}
+            {% if posts.number == num %}
+                <li class="active"><a href="#!">{{ num }}</a></li>
+            {% else %}
+                <li class="waves-effect"><a
+                        href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if posts.has_next %}
+            <li class="waves-effect"><a
+                    href="?page={{ posts.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i
+                    class="material-icons">chevron_right</i></a></li>
+        {% else %}
+            <li class="disabled"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+        {% endif %}
+    </ul>
+{% endif %}
+
+
+{% endblock %}
