@@ -76,13 +76,13 @@ WSGI_APPLICATION = 'find.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'checks',
+        'ENGINE': 'django.db.backends.postgresql',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': 'localhost',
         'PORT': '5432',
-    }
+    },
 }
 
 
