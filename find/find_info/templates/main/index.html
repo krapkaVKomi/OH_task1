@@ -11,21 +11,13 @@ find all
        <button class="btn" type="submit" name="action">Search</button>
     </div>
 </form>
-<hr>
+<hr><br>
 
 {% for item in posts %}
-<div class="row mb-3 text-center">
-      <div class="col-md-8 themed-grid-col">
-        <div class="pb-3">
-           <h4>Назва принтера: {{ item.name }} </h4>
-        </div>
-        <div class="row">
-          <div class="col-md-6 themed-grid-col">Ключ доступу до API: {{ item.api_key }}</div>
-          <div class="col-md-6 themed-grid-col">Чек для клієнта?: {{ item.check_type }}</div>
-        </div>
-      </div>
-      <div class="col-md-4 themed-grid-col">ID принтера: {{ item.point_id }}</div>
-    </div><hr>
+<hr>
+    <h1>Назва документа: {{ item.name }} </h1>
+    <h4>Опис документа: {{ item.description }} </h4>
+ <hr>
 {% endfor %}
 
 {% if posts.has_other_pages %}

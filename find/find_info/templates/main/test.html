@@ -1,0 +1,27 @@
+{% extends 'main/base.html' %}
+{% block title %}
+find all
+{% endblock %}
+
+{% block content %}
+
+    <div style="display:flex;justify-content:center;align-items:center;margin-top: 100px;">
+        <p style="font-size: 50px;">Upload Your File Here..</p>
+    </div>
+    {% if doc_path%}
+        <div style="display:flex;justify-content:center;align-items:center;margin-top: 10px;">
+            <a href="{{audio_path}}">{{doc_path}}</a>
+        </div>
+    {%endif%}
+    <div id="fileform" style="display:flex;justify-content:center;align-items:center;margin-top: 10px;">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <label for="file">Choose file to upload</label>
+            <input type="file" id="file" name="file" multiple />
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+{% endblock %}

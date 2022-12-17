@@ -3,11 +3,11 @@ from django.contrib import admin
 
 from django.contrib import admin
 
-from .models import Checks
+from .models import Doc
 
 
-class CheckAdmin(admin.ModelAdmin):
-    list_display = ('name', 'api_key', 'check_type', 'point_id')
+class DocAdmin(admin.ModelAdmin):
+    list_display = ('description', 'name', 'updated_at', 'link')
 
 
-admin.site.register(Checks, CheckAdmin)
+admin.site.register(Doc, DocAdmin)
