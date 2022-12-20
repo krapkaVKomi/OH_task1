@@ -9,11 +9,26 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 </head>
 <body>
-    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
-      <h5 class="my-0 mr-md-auto font-weight-normal">Find Checks</h5>
+
+<header >
+    <nav class="navbar navbar-dark bg-dark">
+  <!-- Navbar content -->
+
+    <div class="container">
+      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+
+
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+          <li><a href="/test" class="nav-link px-2 text-muted"><h4>add files</h4> </a></li>
+          <li><a href="/" class="nav-link px-2 text-white"><h4>search</h4> </a></li>
+        </ul>
+
+      </div>
     </div>
-<div class="container">
+        </nav>
+  </header>
+
     {% block content %}{% endblock %}
-</div>
+
 </body>
 </html>

@@ -4,21 +4,37 @@ find all
 {% endblock %}
 
 {% block content %}
-<br>
-<form method="GET" >
-    <div class="input-field">
-        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search Here...">
+
+
+<div class="container text">
+  <div class="row">
+    <div class="col">
+      <form method="GET" >
+    <div class="input-field"><br>
+
+        <input style="width: 70%;"  type="text" name="q" value="{{ request.GET.q }}" placeholder="Search Here...">
        <button class="btn" type="submit" name="action">Search</button>
     </div>
-</form>
-<hr><br>
 
-{% for item in posts %}
-<hr>
-    <h1>Назва документа: {{ item.name }} </h1>
-    <h4>Опис документа: {{ item.description }} </h4>
- <hr>
+</form>
+    </div>
+    <div class="col"><br>
+     {% for item in posts %}
+
+        <div class="card">
+  <div class="card-body">
+    <h5 class="card-title">Назва документа: {{ item.name }}</h5>
+    <p class="card-text">Опис документа: {{ item.about_file }}</p>
+    <a href="#" class="btn btn-outline-secondary">Go somewhere</a>
+  </div>
+</div>
+    <h1>  </h1>
+    <h4> </h4>
+
 {% endfor %}
+    </div>
+  </div>
+
 
 {% if posts.has_other_pages %}
     <ul class="pagination">
