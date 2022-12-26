@@ -24,18 +24,18 @@ class Doc(models.Model):
         ordering = ['about_file', 'name', 'updated_at', 'link']
 
 
-class Line(models.Model):
+class LineOfDoc(models.Model):
     objects = None
-    text = models.CharField(max_length=600, verbose_name='Текст рядка')
-    number = models.IntegerField(verbose_name='Номер рядка', blank=True)
+    text = models.CharField(max_length=600, verbose_name='Текст рядка', db_index=True)
 
     def __str__(self):
         return self.text
 
 
-class Word(models.Model):
+class WordOfDoc(models.Model):
     objects = None
     text = models.CharField(max_length=100, verbose_name='Слово')
+    lineOfDoc = models.ForeignKey(LineOfDoc, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.text

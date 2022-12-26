@@ -21,7 +21,6 @@ def document_save(request):
         if doc_type == 'txt':
             description = []
             with open(doc_path, 'r', encoding="windows-1251") as file:
-                count = 1
                 for line in file:
                     words = line.strip().split(' ')
                     description.append(words)
@@ -32,12 +31,9 @@ def document_save(request):
                             words_of_line.append(word)
                             line += word + ' '
 
-                            word_of_doc = Word(text=word)
-                            print(word_of_doc)
-
-                    line_of_doc = Line(text=line, number=count)
-                    print(line_of_doc)
-                    count += 1
+                    line_of_doc = LineOfDoc.objects.create(text=line)
+                    for word in words_of_line:
+                        line_of_doc.wordofdoc_set.create(text=word)
 
             about_file = ''
 
@@ -57,13 +53,14 @@ def document_save(request):
 
 @login_required
 def index(request):
-    checks_list = Doc.objects.order_by('-id')
+    documents = Doc.objects.order_by('-id')
     query = request.GET.get('q')
     if query:
-        checks_list = Doc.objects.filter(
-            Q(name__icontains=query) | Q(description__icontains=query)).distinct()
+        documents = WordOfDoc.objects.filter(Q(text__icontains=query)).distinct()
+        for i in documents:
+            print(i)
 
-    paginator = Paginator(checks_list, 5)  # 5 posts per page
+    paginator = Paginator(documents, 5)  # 5 posts per page
     page = request.GET.get('page')
 
     try:
