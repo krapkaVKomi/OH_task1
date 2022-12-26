@@ -1,9 +1,15 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import *
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib import messages
+from .forms import UserLoginForm
 
 
+@login_required
 def document_save(request):
     if request.method == "POST":
         doc = request.FILES["file"]
@@ -12,26 +18,44 @@ def document_save(request):
         doc_path = doc_file.file.path
         doc_type = doc.name.split('.')
         doc_type = doc_type[-1]
+        if doc_type == 'txt':
+            description = []
+            with open(doc_path, 'r', encoding="windows-1251") as file:
+                count = 1
+                for line in file:
+                    words = line.strip().split(' ')
+                    description.append(words)
+                    words_of_line = []
+                    line = ''
+                    for word in words:
+                        if len(word) > 3:
+                            words_of_line.append(word)
+                            line += word + ' '
 
-        description = []
-        with open(doc_path, 'r', encoding="utf-8") as file:
-            for line in file:
-                words = line.strip().split(' ')
-                description.append(words)
+                            word_of_doc = Word(text=word)
+                            print(word_of_doc)
 
-        about_file = ''
+                    line_of_doc = Line(text=line, number=count)
+                    print(line_of_doc)
+                    count += 1
 
-        if len(description) != 0:
-            for i in description[0]:
-                about_file += i + ' '
+            about_file = ''
 
-        doc_file = Doc.objects.create(name=doc.name, file=doc, link=doc_path,
-                                      description=description, about_file=about_file)
-        doc_path = doc_file.file.path
-        return render(request, "main/test.html", {"doc_path": doc_path})
+            if len(description) != 0:
+                for i in description[0]:
+                    about_file += i + ' '
+
+            doc_file = Doc.objects.create(name=doc.name, file=doc, link=doc_path,
+                                          description=description, about_file=about_file)
+            doc_path = doc_file.file.path
+            return render(request, "main/test.html", {"doc_path": doc_path})
+
+        else:
+            print("ПОМИЛКА ", doc_type)
     return render(request, "main/test.html")
 
 
+@login_required
 def index(request):
     checks_list = Doc.objects.order_by('-id')
     query = request.GET.get('q')
@@ -53,3 +77,35 @@ def index(request):
         'posts': posts,
     }
     return render(request, "main/index.html", context)
+
+
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, 'Реєстрація успішна')
+            return redirect('/')
+        else:
+            messages.error(request, 'Помилка реєстрації')
+    else:
+        form = UserCreationForm()
+    return render(request, 'main/register.html', {"form": form})
+
+
+def user_login(request):
+    if request.method == 'POST':
+        form = UserLoginForm(data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect('/')
+    else:
+        form = UserLoginForm()
+    return render(request, 'main/login.html', {"form": form})
+
+
+def user_logout(request):
+    logout(request)
+    return redirect('/')
