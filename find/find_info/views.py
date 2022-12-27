@@ -53,14 +53,15 @@ def document_save(request):
 
 @login_required
 def index(request):
-    documents = Doc.objects.order_by('-id')
+    words = WordOfDoc.objects.order_by()
     query = request.GET.get('q')
     if query:
-        documents = WordOfDoc.objects.filter(Q(text__icontains=query)).distinct()
-        for i in documents:
-            print(i)
+        words = WordOfDoc.objects.filter(text=query) #.all().values()
+        for word in words:
+            line = LineOfDoc.objects.filter(text=word)
+            print(line.query)
 
-    paginator = Paginator(documents, 5)  # 5 posts per page
+    paginator = Paginator(words, 1)  # 5 posts per page
     page = request.GET.get('page')
 
     try:
@@ -72,6 +73,7 @@ def index(request):
 
     context = {
         'posts': posts,
+        'words': words
     }
     return render(request, "main/index.html", context)
 
