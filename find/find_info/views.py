@@ -37,6 +37,7 @@ def document_save(request):
                             words_of_line.append(word)
                             line += word + ' '
 
+
                     line_of_doc = LineOfDoc.objects.create(text=line, doc=doc_file, line_number=line_count)
                     line_count += 1
                     line = line.split(' ')
@@ -55,13 +56,15 @@ def document_save(request):
 def index(request):
     docs = Doc.objects.all()
     query = request.GET.get('q')
-    select = request.GET.get('s')
-    print(select)
+    select_file = request.GET.get('s')
+    lines = LineOfDoc.objects.filter(wordofdoc__text=query)
+
     if query:
         words = WordOfDoc.objects.filter(text=query)  # .all().values()
 
         context = {
             'words': words,
+            'lines': lines,
             'docs': docs
         }
         return render(request, "main/index.html", context)

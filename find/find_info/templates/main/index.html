@@ -35,9 +35,6 @@
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="\">FIND</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
       <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
               {% if request.user.is_authenticated %}
@@ -71,29 +68,56 @@
 
 <div class="container text">
     <br><br><br>
+  <div class="row">
 
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col">Номер строки</th>
-      <th scope="col">Слово</th>
-      <th scope="col">Текст строки</th>
-      <th scope="col">Назва документу</th>
-    </tr>
-  </thead>
 
-  <tbody>
-    {% for item in words %}
-    <tr>
-      <th scope="row">{{ item.line_id }}</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-    </tr>
-    {% endfor %}
-  </tbody>
+        <div class="col-6">
 
-</table>
 
+        <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Слово</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for word in words %}
+        <tr>
+          <th scope="row">{{ word.line_id }}</th>
+          <td>{{ word.text }}</td>
+        </tr>
+        {% endfor %}
+
+
+      </tbody>
+
+        </table>
+        </div>
+        <div class="col-6">
+            <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Текст строки</th>
+          <th >номер</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for line in lines %}
+        <tr>
+          <td>{{ line.text }}</td>
+          <td>{{ line.line_number }}</td>
+
+        </tr>
+        {% endfor %}
+
+
+      </tbody>
+
+        </table>
+        </div>
+ </div>
     </body>
 </html>
