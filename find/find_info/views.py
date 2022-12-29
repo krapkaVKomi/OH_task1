@@ -57,6 +57,9 @@ def index(request):
     docs = Doc.objects.all()
     query = request.GET.get('q')
     select_file = request.GET.get('s')
+    select_file_id = Doc.objects.filter(name=select_file)
+    select_file_id = select_file_id.values('id').get()
+    select_file_id = select_file_id['id']
     lines = LineOfDoc.objects.filter(wordofdoc__text=query)
 
     if query:
