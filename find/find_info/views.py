@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import *
-from django.db.models import Q
+# from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -14,16 +14,21 @@ def document_save(request):
     if request.method == "POST":
         doc = request.FILES["file"]
 
-        doc_file = Document.objects.create(name=doc.name, file=doc)
+        doc_file = Doc.objects.create(name=doc.name, file=doc)
         doc_path = doc_file.file.path
         doc_type = doc.name.split('.')
         doc_type = doc_type[-1]
         if doc_type == 'txt':
-            description = []
             with open(doc_path, 'r', encoding="windows-1251") as file:
                 for line in file:
-                    words = line.strip().split(' ')
-                    description.append(words)
+                    words = line.strip() \
+                        .replace('\t', '') \
+                        .replace('.', '') \
+                        .replace(',', '') \
+                        .replace('!', '') \
+                        .replace('?', '') \
+                        .replace(';', '').split(' ')
+
                     words_of_line = []
                     line = ''
                     for word in words:
@@ -31,18 +36,10 @@ def document_save(request):
                             words_of_line.append(word)
                             line += word + ' '
 
-                    line_of_doc = LineOfDoc.objects.create(text=line)
-                    for word in words_of_line:
-                        line_of_doc.wordofdoc_set.create(text=word)
-
-            about_file = ''
-
-            if len(description) != 0:
-                for i in description[0]:
-                    about_file += i + ' '
-
-            doc_file = Doc.objects.create(name=doc.name, file=doc, link=doc_path,
-                                          description=description, about_file=about_file)
+                    line_of_doc = LineOfDoc.objects.create(text=line, doc=doc_file)
+                    line = line.split(' ')
+                    for word in line:
+                        WordOfDoc.objects.create(text=word, line=line_of_doc)
             doc_path = doc_file.file.path
             return render(request, "main/test.html", {"doc_path": doc_path})
 
@@ -56,26 +53,29 @@ def index(request):
     words = WordOfDoc.objects.order_by()
     query = request.GET.get('q')
     if query:
-        words = WordOfDoc.objects.filter(text=query) #.all().values()
+        words = WordOfDoc.objects.filter(text=query)  # .all().values()
         for word in words:
             line = LineOfDoc.objects.filter(text=word)
-            print(line.query)
 
-    paginator = Paginator(words, 1)  # 5 posts per page
-    page = request.GET.get('page')
 
-    try:
-        posts = paginator.page(page)
-    except PageNotAnInteger:
-        posts = paginator.page(1)
-    except EmptyPage:
-        posts = paginator.page(paginator.num_pages)
+        paginator = Paginator(words, 1)  # 5 posts per page
+        page = request.GET.get('page')
 
-    context = {
-        'posts': posts,
-        'words': words
-    }
-    return render(request, "main/index.html", context)
+        try:
+            posts = paginator.page(page)
+        except PageNotAnInteger:
+            posts = paginator.page(1)
+        except EmptyPage:
+            posts = paginator.page(paginator.num_pages)
+
+        context = {
+            'posts': posts,
+            'words': words
+        }
+        return render(request, "main/index.html", context)
+    else:
+        return render(request, "main/index.html")
+
 
 
 def register(request):

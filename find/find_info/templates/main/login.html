@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+</head>
+<body>
+
+
+<header >
+    <div class="container">
+
+        {% if messages %}
+        {% for message in messages %}
+                {% if message.tags == 'error' %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-{{ message.tags }}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endif %}
+
+        {% endfor %}
+        {% endif %}
+        </div>
+  </header>
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand">FIND</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+              {% if request.user.is_authenticated %}
+         <li> <a class="nav-link px-2 text-white" href="{% url 'logout' %}">logout</a></li>
+                {% else %}
+         <li> <a class="nav-link px-2 text-white" href="/register">Реєстрація</a></li>
+          <li><a class="nav-link px-2 text-white" href="/login">Авторизація</a></li>
+          {% endif %}
+        </ul>
+
+      </div>
+    </div>
+  </nav>
+<hr><hr><hr>
+<div class="container">
+  <div class="row">
+    <div class="col">
+    </div>
+    <div class="col">
+         <h1>Login</h1>
+<form method="post" style="">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <br>
+    <button class="w-100 btn btn-lg btn-primary" type="submit">Увійти</button>
+</form>
+
+    </div>
+    <div class="col">
+
+    </div>
+  </div>
+</div>
+
+  </body>
+</html>

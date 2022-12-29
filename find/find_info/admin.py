@@ -3,15 +3,11 @@ from django.contrib import admin
 
 from django.contrib import admin
 
-from .models import Doc, Document, LineOfDoc, WordOfDoc
+from .models import Doc, LineOfDoc, WordOfDoc
 
 
 class DocAdmin(admin.ModelAdmin):
-    list_display = ('description', 'name', 'updated_at', 'link')
-
-
-class DocumentAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name')
+    list_display = ('name', 'updated_at', 'link')
 
 
 class LineOfDocAdmin(admin.ModelAdmin):
@@ -23,6 +19,5 @@ class WordOfDocAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Doc, DocAdmin)
-admin.site.register(Document, DocumentAdmin)
 admin.site.register(LineOfDoc, LineOfDocAdmin)
 admin.site.register(WordOfDoc, WordOfDocAdmin)
