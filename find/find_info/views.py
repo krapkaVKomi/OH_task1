@@ -53,12 +53,14 @@ def document_save(request):
 
 @login_required
 def index(request):
+    docs = Doc.objects.all()
     query = request.GET.get('q')
     if query:
         words = WordOfDoc.objects.filter(text=query)  # .all().values()
 
         context = {
-            'words': words
+            'words': words,
+            'docs': docs
         }
         return render(request, "main/index.html", context)
     else:

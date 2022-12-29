@@ -48,19 +48,20 @@
           {% endif %}
         </ul>
         <form method="GET" class="d-flex">
+
           <input class="form-control me-2" style="width: 500px;" type="text" name="q" value="{{ request.GET.q }}" placeholder="Search" aria-label="Search">
           <button class="btn btn-outline-success" type="submit" name="action">Search</button>
+
+                 <select class="form-select" aria-label="Default select example">
+                     {% for item in docs %}
+                  <option selected>{{ item.name }}</option>
+                     {% endfor %}
+                 </select>
+
         </form>
 
       </div>
 
-    <div class="btn-group">
-    <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tables</button>
-  <div class="dropdown-menu">
-    <a class="nav-link px-2 text-white" href="/register">Реєстрація</a>
-      <a class="nav-link px-2 text-white" href="/login">Авторизація</a>
-  </div>
-    </div>
     <a href="\admin" style="color: white">
     <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
   <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
@@ -70,12 +71,6 @@
 
 <div class="container text">
     <br><br><br>
-    <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                <label class="form-check-label" for="flexCheckDefault">
-                Default checkbox
-                </label>
-            </div>
 
 <table class="table">
   <thead>
