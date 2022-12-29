@@ -17,6 +17,7 @@ class Doc(models.Model):
 
 
 class LineOfDoc(models.Model):
+    line_number = models.IntegerField(verbose_name='Номер ряду', default=0)
     text = models.CharField(max_length=600, verbose_name='Текст рядка')
     doc = models.ForeignKey(Doc, on_delete=models.CASCADE)
 

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import *
 # from django.db.models import Q
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+# from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
@@ -20,6 +20,7 @@ def document_save(request):
         doc_type = doc_type[-1]
         if doc_type == 'txt':
             with open(doc_path, 'r', encoding="windows-1251") as file:
+                line_count = 1
                 for line in file:
                     words = line.strip() \
                         .replace('\t', '') \
@@ -36,12 +37,14 @@ def document_save(request):
                             words_of_line.append(word)
                             line += word + ' '
 
-                    line_of_doc = LineOfDoc.objects.create(text=line, doc=doc_file)
+                    line_of_doc = LineOfDoc.objects.create(text=line, doc=doc_file, line_number=line_count)
+                    line_count += 1
                     line = line.split(' ')
                     for word in line:
                         WordOfDoc.objects.create(text=word, line=line_of_doc)
             doc_path = doc_file.file.path
-            return render(request, "main/test.html", {"doc_path": doc_path})
+            render(request, "main/test.html", {"doc_path": doc_path})
+            return redirect('/')
 
         else:
             print("ПОМИЛКА ", doc_type)
@@ -50,32 +53,16 @@ def document_save(request):
 
 @login_required
 def index(request):
-    words = WordOfDoc.objects.order_by()
     query = request.GET.get('q')
     if query:
         words = WordOfDoc.objects.filter(text=query)  # .all().values()
-        for word in words:
-            line = LineOfDoc.objects.filter(text=word)
-
-
-        paginator = Paginator(words, 1)  # 5 posts per page
-        page = request.GET.get('page')
-
-        try:
-            posts = paginator.page(page)
-        except PageNotAnInteger:
-            posts = paginator.page(1)
-        except EmptyPage:
-            posts = paginator.page(paginator.num_pages)
 
         context = {
-            'posts': posts,
             'words': words
         }
         return render(request, "main/index.html", context)
     else:
         return render(request, "main/index.html")
-
 
 
 def register(request):
