@@ -52,7 +52,7 @@
           <input class="form-control me-2" style="width: 500px;" type="text" name="q" value="{{ request.GET.q }}" placeholder="Search" aria-label="Search">
           <button class="btn btn-outline-success" type="submit" name="action">Search</button>
 
-                 <select class="form-select" aria-label="Default select example">
+                 <select class="form-select" aria-label="Default select example" name="s" value="{{ request.GET.s }}">
                      {% for item in docs %}
                   <option selected>{{ item.name }}</option>
                      {% endfor %}

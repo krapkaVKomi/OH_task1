@@ -55,6 +55,8 @@ def document_save(request):
 def index(request):
     docs = Doc.objects.all()
     query = request.GET.get('q')
+    select = request.GET.get('s')
+    print(select)
     if query:
         words = WordOfDoc.objects.filter(text=query)  # .all().values()
 
@@ -64,7 +66,10 @@ def index(request):
         }
         return render(request, "main/index.html", context)
     else:
-        return render(request, "main/index.html")
+        context = {
+            'docs': docs
+        }
+        return render(request, "main/index.html", context)
 
 
 def register(request):
