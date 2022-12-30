@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
 from django.db.models import Q
-# from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
@@ -73,7 +73,19 @@ def index(request):
                     if i == j:
                         arr.append(j)
 
+            paginator = Paginator(arr, 2)  # 2 posts per page
+            page = request.GET.get('page')
+
+            try:
+                posts = paginator.page(page)
+            except PageNotAnInteger:
+                posts = paginator.page(1)
+            except EmptyPage:
+                posts = paginator.page(paginator.num_pages)
+
+
             context = {
+                'posts': posts,
                 'query': query,
                 'lines': arr,
                 'docs': docs

@@ -91,7 +91,7 @@
       </thead>
 
       <tbody>
-        {% for line in lines %}
+        {% for line in posts %}
         <tr>
           <td>{{ query }}</td>
           <td>{{ line.text }}</td>
@@ -105,6 +105,33 @@
       </tbody>
 
         </table>
+    {% if posts.has_other_pages %}
+    <ul class="pagination">
+        {% if posts.has_previous %}
+            <li class="waves-effect"><a href="?page=
+                    {{ posts.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.s %}&s={{ request.GET.s }}{% endif %}"><i
+                    class="material-icons">chevron_left</i></a></li>
+        {% else %}
+            <li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
+        {% endif %}
+        {% for num in posts.paginator.page_range %}
+            {% if posts.number == num %}
+                <li class="active"><a href="#!">{{ num }}</a></li>
+            {% else %}
+                <li class="waves-effect"><a
+                        href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.s %}&s={{ request.GET.s }}{% endif %}">{{ num }}</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if posts.has_next %}
+            <li class="waves-effect"><a
+                    href="?page={{ posts.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.s %}&s={{ request.GET.s }}{% endif %}"><i
+                    class="material-icons">chevron_right</i></a></li>
+        {% else %}
+            <li class="disabled"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+        {% endif %}
+    </ul>
+{% endif %}
         </div>
     </body>
 </html>
