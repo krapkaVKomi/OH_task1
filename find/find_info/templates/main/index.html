@@ -68,39 +68,13 @@
 
 <div class="container text">
     <br><br><br>
-  <div class="row">
 
-
-        <div class="col-6">
-
-
-        <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Слово</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {% for word in words %}
-        <tr>
-          <th scope="row">{{ word.line_id }}</th>
-          <td>{{ word.text }}</td>
-        </tr>
-        {% endfor %}
-
-
-      </tbody>
-
-        </table>
-        </div>
-        <div class="col-6">
             <table class="table">
       <thead>
         <tr>
-          <th scope="col">Текст строки</th>
-          <th >Номер</th>
+            <th >Word</th>
+          <th scope="col">Word from line</th>
+            <th >Line_number</th>
           <th >Doc_ID</th>
         </tr>
       </thead>
@@ -108,6 +82,7 @@
       <tbody>
         {% for line in lines %}
         <tr>
+          <td>{{ query }}</td>
           <td>{{ line.text }}</td>
           <td>{{ line.line_number }}</td>
           <td>{{ line.doc_id }}</td>
@@ -120,6 +95,5 @@
 
         </table>
         </div>
- </div>
     </body>
 </html>

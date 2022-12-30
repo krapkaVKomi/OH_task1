@@ -83,7 +83,7 @@ def index(request):
 
 
         context = {
-            #'words': words,
+            'query': query,
             'lines': arr,
             'docs': docs
         }
