@@ -10,7 +10,7 @@ from .forms import UserLoginForm
 
 
 @login_required
-def document_save(request):
+def index(request):
     if request.method == "POST":
         doc = request.FILES["file"]
 
@@ -43,57 +43,48 @@ def document_save(request):
                     for word in line:
                         WordOfDoc.objects.create(text=word, line=line_of_doc, doc=doc_file)
             doc_path = doc_file.file.path
-            render(request, "main/test.html", {"doc_path": doc_path})
+            render(request, "main/index.html", {"doc_path": doc_path})
             return redirect('/')
 
         else:
             print("ПОМИЛКА ", doc_type)
-    return render(request, "main/test.html")
+    else:
+        docs = Doc.objects.all()
+        query = request.GET.get('q')
+        select_file = request.GET.get('s')
+        if select_file and query:
+            select_file_id = Doc.objects.filter(name=select_file)
 
+            if len(select_file_id) == 1:
+                select_file_id = select_file_id.values('id').get()
+                select_file_id = select_file_id['id']
+                lines = LineOfDoc.objects.filter(doc_id=select_file_id)
 
-@login_required
-def index(request):
-    docs = Doc.objects.all()
-    query = request.GET.get('q')
-    select_file = request.GET.get('s')
-    if select_file and query:
-        select_file_id = Doc.objects.filter(name=select_file)
+            else:
+                select_file_id = select_file_id[0]
+                lines = LineOfDoc.objects.filter(doc_id=select_file_id)
 
-        # words = LineOfDoc.objects.filter(doc_id=select_file_id)
-        # print(words)
+            liness = LineOfDoc.objects.filter(
+                Q(text__icontains=query)
+            ).distinct()
+            arr = []
+            for i in liness:
+                for j in lines:
+                    if i == j:
+                        arr.append(j)
 
-        if len(select_file_id) == 1:
-            select_file_id = select_file_id.values('id').get()
-            select_file_id = select_file_id['id']
-            lines = LineOfDoc.objects.filter(doc_id=select_file_id)
+            context = {
+                'query': query,
+                'lines': arr,
+                'docs': docs
+            }
+            return render(request, "main/index.html", context)
 
         else:
-            select_file_id = select_file_id[0]
-            lines = LineOfDoc.objects.filter(doc_id=select_file_id)
-
-        liness = LineOfDoc.objects.filter(
-            Q(text__icontains=query)
-        ).distinct()
-        arr = []
-        for i in liness:
-            for j in lines:
-                if i == j:
-                    arr.append(j)
-
-
-
-        context = {
-            'query': query,
-            'lines': arr,
-            'docs': docs
-        }
-        return render(request, "main/index.html", context)
-
-    else:
-        context = {
-            'docs': docs
-        }
-        return render(request, "main/index.html", context)
+            context = {
+                'docs': docs
+            }
+            return render(request, "main/index.html", context)
 
 
 def register(request):

@@ -58,6 +58,21 @@
         </form>
 
       </div>
+        {% if doc_path%}
+        <div style="display:flex;justify-content:center;align-items:center;margin-top: 10px;">
+            <a href="{{audio_path}}">{{doc_path}}</a>
+        </div>
+    {%endif%}
+    <div id="fileform" style="display:flex;justify-content:center;align-items:center;margin-top: 10px;">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <label for="file"  style="color: white;">Choose file to upload</label>
+            <input style="color: white;" type="file" id="file" name="file" multiple />
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
 
     <a href="\admin" style="color: white">
     <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
