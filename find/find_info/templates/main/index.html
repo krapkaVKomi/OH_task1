@@ -6,7 +6,9 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+
 </head>
 <body>
 
@@ -46,13 +48,14 @@
         </ul>
         <form method="GET" class="d-flex">
 
-          <input class="form-control me-2" style="width: 500px;" type="text" name="q" value="{{ request.GET.q }}" placeholder="Search" aria-label="Search">
-                 <select class="form-select" aria-label="Default select example" name="s" value="{{ request.GET.s }}">
+          <input class="form-control me-2" style="width: 600px;" type="text" name="q" value="{{ request.GET.q }}" placeholder="Search" aria-label="Search">
+                 <select style="width: 150px;" class="nav-item dropdown" aria-label="Default select example" name="s" value="{{ request.GET.s }}">
                      {% for item in docs %}
                   <option selected>{{ item.name }}</option>
                      {% endfor %}
                  </select>
             <button class="btn btn-outline-success" type="submit" name="action">Search</button>
+
 
         </form>
 
@@ -79,7 +82,7 @@
 
 <div class="container text">
     <br><br><br>
-
+{% if posts %}
             <table class="table">
       <thead>
         <tr>
@@ -141,6 +144,7 @@
 
 
   </ul>
+        {%endif%}
 </nav>
 
 

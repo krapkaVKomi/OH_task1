@@ -73,7 +73,7 @@ def index(request):
                     if i == j:
                         arr.append(j)
 
-            paginator = Paginator(arr, 2)  # 2 posts per page
+            paginator = Paginator(arr, 20)
             page = request.GET.get('page')
 
             try:
