@@ -85,6 +85,7 @@ def index(request):
 
 
             context = {
+                'table': True,
                 'posts': posts,
                 'query': query,
                 'lines': arr,
@@ -94,6 +95,7 @@ def index(request):
 
         else:
             context = {
+                'table': False,
                 'docs': docs
             }
             return render(request, "main/index.html", context)
