@@ -82,7 +82,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+          <h5 class="modal-title" id="exampleModalLabel">Upload your file here</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -93,7 +93,7 @@
         </div>
     {%endif%}
     <div id="fileform" style="display:flex;justify-content:center;align-items:center;margin-top: 10px;">
-        <form method="post" enctype="multipart/form-data">
+        <form class="btn btn-dark" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <input style="color: white;" type="file" id="file" name="file" multiple />
             <button type="submit">Submit</button>
