@@ -54,11 +54,15 @@
             <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false" style="color: white;">Search in ?</a>
             <ul class="dropdown-menu">
-                {% for item in docs %}
+                {% if list_of_docs.docs %}
+                {% for item in list_of_docs.docs %}
                 <li><button class="dropdown-item" type="submit" name="s" value="{{ item.name }}">{{ item.name }}</button></li>
                      {% endfor %}
                 <!-- Button trigger modal -->
                 <li><a class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#exampleModal" style="width: 100%;">Upload file</a></li>
+                {% else %}
+                <li><a class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#exampleModal" style="width: 100%;">Upload file</a></li>
+                {%endif%}
             </ul>
           </li>
         </ul>

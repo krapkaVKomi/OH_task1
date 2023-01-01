@@ -50,6 +50,11 @@ def index(request):
             print("ПОМИЛКА ", doc_type)
     else:
         docs = Doc.objects.all()
+        if len(docs) != 0:
+            list_of_docs = {'docs': docs}
+            print(list_of_docs)
+        else:
+            list_of_docs = {'docs': False}
         query = request.GET.get('q')
         select_file = request.GET.get('s')
         if select_file and query:
@@ -87,15 +92,14 @@ def index(request):
                 'table': True,
                 'posts': posts,
                 'select_file': select_file,
-                'docs': docs
+                'list_of_docs': list_of_docs
             }
             return render(request, "main/index.html", context)
 
         else:
-            context = {
-                'table': False,
-                'docs': docs
-            }
+            context = {'table': False,
+                       'list_of_docs': list_of_docs
+                       }
             return render(request, "main/index.html", context)
 
 
