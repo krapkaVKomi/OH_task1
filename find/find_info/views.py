@@ -73,7 +73,7 @@ def index(request):
                     if i == j:
                         arr.append(j)
 
-            paginator = Paginator(arr, 20)
+            paginator = Paginator(arr, 30)
             page = request.GET.get('page')
 
             try:
@@ -83,12 +83,10 @@ def index(request):
             except EmptyPage:
                 posts = paginator.page(paginator.num_pages)
 
-
             context = {
                 'table': True,
                 'posts': posts,
-                'query': query,
-                'lines': arr,
+                'select_file': select_file,
                 'docs': docs
             }
             return render(request, "main/index.html", context)
