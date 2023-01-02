@@ -19,7 +19,7 @@ def index(request):
         doc_type = doc.name.split('.')
         doc_type = doc_type[-1]
         if doc_type == 'txt':
-            with open(doc_path, 'r', encoding="windows-1251") as file:
+            with open(doc_path, 'r', encoding="utf-8") as file:
                 line_count = 1
                 for line in file:
                     words = line.strip() \
