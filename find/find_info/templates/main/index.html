@@ -151,7 +151,7 @@
 
 
 
-    {% for num in posts.paginator.page_range %}
+    {% for num in posts.paginator.page_range|slice:":20" %}
             {% if posts.number == num %}
                 <li class="page-item active"><a class="btn btn-dark" href="#!">{{ num }}</a></li>
             {% else %}

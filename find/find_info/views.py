@@ -33,6 +33,7 @@ def index(request):
                     words_of_line = []
                     line = ''
                     for word in words:
+                        word = word.strip()
                         if len(word) > 3:
                             words_of_line.append(word)
                             line += word + ' '
