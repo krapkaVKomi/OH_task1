@@ -63,18 +63,18 @@ def index(request):
             if len(select_file_id) == 1:
                 select_file_id = select_file_id.values('id').get()
                 select_file_id = select_file_id['id']
-                lines = LineOfDoc.objects.filter(doc_id=select_file_id)
+                words = WordOfDoc.objects.filter(doc_id=select_file_id)
 
             else:
                 select_file_id = select_file_id[0]
-                lines = LineOfDoc.objects.filter(doc_id=select_file_id)
+                words = WordOfDoc.objects.filter(doc_id=select_file_id)
 
-            liness = LineOfDoc.objects.filter(
+            word_filter = WordOfDoc.objects.filter(
                 Q(text__icontains=query)
             ).distinct()
             arr = []
-            for i in liness:
-                for j in lines:
+            for i in word_filter:
+                for j in words:
                     if i == j:
                         arr.append(j)
 

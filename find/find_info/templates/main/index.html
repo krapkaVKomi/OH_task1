@@ -122,11 +122,11 @@
       </thead>
 
       <tbody>
-        {% for line in posts %}
+        {% for word in posts %}
         <tr>
-          <td>{{ line.text }}</td>
-          <td>{{ line.line_number }}</td>
-          <td>{{ select_file }}</td>
+          <td>{{ word.line }}</td>
+          <td>{{ word.line.line_number }}</td>
+          <td>{{ word.doc }}</td>
 
         </tr>
         {% endfor %}
