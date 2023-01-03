@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from .forms import UserLoginForm
+from datetime import datetime
 
 
 @login_required
@@ -50,25 +51,20 @@ def index(request):
         else:
             print("ПОМИЛКА ", doc_type)
     else:
+        start = datetime.now()
         docs = Doc.objects.all()
         if len(docs) != 0:
             list_of_docs = {'docs': docs}
-            print(list_of_docs)
         else:
             list_of_docs = {'docs': False}
         query = request.GET.get('q')
         select_file = request.GET.get('s')
         if select_file and query:
-            select_file_id = Doc.objects.filter(name=select_file)
+            select_file_id = Doc.objects.filter(name=select_file)[0:]
 
-            if len(select_file_id) == 1:
-                select_file_id = select_file_id.values('id').get()
-                select_file_id = select_file_id['id']
-                words = WordOfDoc.objects.filter(doc_id=select_file_id)
-
-            else:
-                select_file_id = select_file_id[0]
-                words = WordOfDoc.objects.filter(doc_id=select_file_id)
+            select_file_id = select_file_id.values('id').get()
+            select_file_id = select_file_id['id']
+            words = WordOfDoc.objects.filter(doc_id=select_file_id)
 
             word_filter = WordOfDoc.objects.filter(
                 Q(text__icontains=query)
@@ -95,6 +91,9 @@ def index(request):
                 'select_file': select_file,
                 'list_of_docs': list_of_docs
             }
+            duration = datetime.now() - start
+            print('Виконання завершено!')
+            print(f'Тривалість: {duration}')
             return render(request, "main/index.html", context)
 
         else:
