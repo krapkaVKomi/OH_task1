@@ -58,37 +58,49 @@ def index(request):
         else:
             list_of_docs = {'docs': False}
         query = request.GET.get('q')
-        select_file = request.GET.get('s')
-        if select_file and query:
-            select_file_id = Doc.objects.filter(name=select_file)[0:]
 
-            select_file_id = select_file_id.values('id').get()
-            select_file_id = select_file_id['id']
-            words = WordOfDoc.objects.filter(doc_id=select_file_id)
+        get_docs = []
 
-            word_filter = WordOfDoc.objects.filter(
-                Q(text__icontains=query)
-            ).distinct()
+        for item in docs:
+
+            select_file = request.GET.get(str(item))
+            if select_file:
+                get_docs.append(select_file)
+
+        #print(get_docs)
+
+        if query:
+            docs = []
+            for doc in get_docs:
+                select_file_id = Doc.objects.filter(name=doc)[0:]
+                select_file_id = select_file_id.values('id').get()
+                select_file_id = select_file_id['id']
+                words_filter_docs = WordOfDoc.objects.filter(doc_id=select_file_id)
+                for i in words_filter_docs:
+                    docs.append(i)
+
+            word_filter = WordOfDoc.objects.filter(text=query)
             arr = []
             for i in word_filter:
-                for j in words:
+                for j in docs:
+                    print(i, ' + ', j)
                     if i == j:
                         arr.append(j)
+            # віджет тепер інший, тепер Get запит виглядає інакше i пагінація знову зломана
 
-            paginator = Paginator(arr, 30)
-            page = request.GET.get('page')
-
-            try:
-                posts = paginator.page(page)
-            except PageNotAnInteger:
-                posts = paginator.page(1)
-            except EmptyPage:
-                posts = paginator.page(paginator.num_pages)
+            # paginator = Paginator(arr, 30)
+            # page = request.GET.get('page')
+            #
+            # try:
+            #     posts = paginator.page(page)
+            # except PageNotAnInteger:
+            #     posts = paginator.page(1)
+            # except EmptyPage:
+            #     posts = paginator.page(paginator.num_pages)
 
             context = {
                 'table': True,
-                'posts': posts,
-                'select_file': select_file,
+                'posts': arr,
                 'list_of_docs': list_of_docs
             }
             duration = datetime.now() - start
