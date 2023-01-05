@@ -6,7 +6,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
-from .forms import UserLoginForm
+from .forms import UserLoginForm, NameForm
 from datetime import datetime
 
 
@@ -14,12 +14,14 @@ from datetime import datetime
 def index(request):
     if request.method == "POST":
         doc = request.FILES["file"]
-
-        doc_file = Doc.objects.create(name=doc.name, file=doc)
-        doc_path = doc_file.file.path
         doc_type = doc.name.split('.')
         doc_type = doc_type[-1]
         if doc_type == 'txt':
+            form_doc_name = NameForm(request.POST)
+            doc_name = form_doc_name['your_name'].value()
+            doc_file = Doc.objects.create(name=doc.name, file=doc, search_name=doc_name)
+            doc_path = doc_file.file.path
+
             with open(doc_path, 'r', encoding="utf-8") as file:
                 line_count = 1
                 for line in file:
@@ -29,7 +31,7 @@ def index(request):
                         .replace(',', '') \
                         .replace('!', '') \
                         .replace('?', '') \
-                        .replace(';', '').split(' ')
+                        .replace('  ', ' ').split(' ')
 
                     words_of_line = []
                     line = ''
@@ -58,21 +60,18 @@ def index(request):
         else:
             list_of_docs = {'docs': False}
         query = request.GET.get('q')
-
         get_docs = []
 
         for item in docs:
-
-            select_file = request.GET.get(str(item))
+            select_file = request.GET.get(str(item.search_name))
             if select_file:
                 get_docs.append(select_file)
-
-        #print(get_docs)
 
         if query:
             docs = []
             for doc in get_docs:
-                select_file_id = Doc.objects.filter(name=doc)[0:]
+                print(doc)
+                select_file_id = Doc.objects.filter(search_name=doc)[0:]
                 select_file_id = select_file_id.values('id').get()
                 select_file_id = select_file_id['id']
                 words_filter_docs = WordOfDoc.objects.filter(doc_id=select_file_id)
@@ -83,8 +82,8 @@ def index(request):
             arr = []
             for i in word_filter:
                 for j in docs:
-                    print(i, ' + ', j)
                     if i == j:
+                        print(i, ' + ', j)
                         arr.append(j)
             # віджет тепер інший, тепер Get запит виглядає інакше i пагінація знову зломана
 

@@ -2,7 +2,8 @@ from django.db import models
 
 
 class Doc(models.Model):
-    name = models.CharField(max_length=150, verbose_name='Назва', default='file')
+    name = models.CharField(max_length=150, default='file')
+    search_name = models.CharField(max_length=100, verbose_name='Назва', null=True)
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата оновлення')
     link = models.CharField(max_length=150, verbose_name='Посилання', blank=True)
     file = models.FileField()
@@ -13,7 +14,7 @@ class Doc(models.Model):
 
     class Meta:
         verbose_name = 'Doc'
-        ordering = ['about_file', 'name', 'updated_at', 'link']
+        ordering = ['about_file', 'search_name', 'updated_at', 'link']
 
 
 class LineOfDoc(models.Model):

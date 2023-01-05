@@ -7,7 +7,7 @@ from .models import Doc, LineOfDoc, WordOfDoc
 
 
 class DocAdmin(admin.ModelAdmin):
-    list_display = ('name', 'updated_at', 'link')
+    list_display = ('search_name', 'updated_at', 'link')
 
 
 class LineOfDocAdmin(admin.ModelAdmin):
