@@ -58,9 +58,9 @@
                 <div class="form-check" name="s">
                 {% for item in list_of_docs.docs %}
                     <div>
-                      <input class="form-check-input" type="checkbox" name="{{ item.search_name }}" value="{{ item.search_name }}"  id="flexCheckDefault">
+                      <input class="form-check-input" type="checkbox" name="{{ item.name }}" value="{{ item.name }}"  id="flexCheckDefault">
                       <label class="form-check-label" for="flexCheckDefault">
-                        {{ item.search_name }}
+                        {{ item.name }}
                       </label>
                     </div>
                      {% endfor %}
@@ -136,7 +136,7 @@
         <tr>
           <td>{{ word.line }}</td>
           <td>{{ word.line.line_number }}</td>
-          <td>{{ word.line.doc.search_name }}</td>
+          <td>{{ word.line.doc.name }}</td>
 
         </tr>
         {% endfor %}

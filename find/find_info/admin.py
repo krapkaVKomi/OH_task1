@@ -1,13 +1,14 @@
 from django.contrib import admin
 
+from .models import *
 
-from django.contrib import admin
 
-from .models import Doc, LineOfDoc, WordOfDoc
+class FileAdmin(admin.ModelAdmin):
+    list_display = ('name', 'file')
 
 
 class DocAdmin(admin.ModelAdmin):
-    list_display = ('search_name', 'updated_at', 'link')
+    list_display = ('name', 'updated_at', 'link')
 
 
 class LineOfDocAdmin(admin.ModelAdmin):
@@ -19,5 +20,6 @@ class WordOfDocAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Doc, DocAdmin)
+admin.site.register(File, FileAdmin)
 admin.site.register(LineOfDoc, LineOfDocAdmin)
 admin.site.register(WordOfDoc, WordOfDocAdmin)

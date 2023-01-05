@@ -19,12 +19,12 @@ def index(request):
         if doc_type == 'txt':
             form_doc_name = NameForm(request.POST)
             doc_name = form_doc_name['your_name'].value()
-            doc_file = Doc.objects.create(name=doc.name, file=doc, search_name=doc_name)
+            doc_file = File.objects.create(name=doc.name, file=doc)
             doc_path = doc_file.file.path
-
-            with open(doc_path, 'r', encoding="utf-8") as file:
+            document = Doc.objects.create(name=doc_name, link=doc_path)
+            with open(doc_path, 'r', encoding="utf-8") as txt:
                 line_count = 1
-                for line in file:
+                for line in txt:
                     words = line.strip() \
                         .replace('\t', '') \
                         .replace('.', '') \
@@ -41,12 +41,11 @@ def index(request):
                             words_of_line.append(word)
                             line += word + ' '
 
-                    line_of_doc = LineOfDoc.objects.create(text=line, doc=doc_file, line_number=line_count)
+                    line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
                     line_count += 1
                     line = line.split(' ')
                     for word in line:
-                        WordOfDoc.objects.create(text=word, line=line_of_doc, doc=doc_file)
-            doc_path = doc_file.file.path
+                        WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
             render(request, "main/index.html", {"doc_path": doc_path})
             return redirect('/')
 
@@ -63,15 +62,14 @@ def index(request):
         get_docs = []
 
         for item in docs:
-            select_file = request.GET.get(str(item.search_name))
+            select_file = request.GET.get(str(item))
             if select_file:
                 get_docs.append(select_file)
 
         if query:
             docs = []
             for doc in get_docs:
-                print(doc)
-                select_file_id = Doc.objects.filter(search_name=doc)[0:]
+                select_file_id = Doc.objects.filter(name=doc)[0:]
                 select_file_id = select_file_id.values('id').get()
                 select_file_id = select_file_id['id']
                 words_filter_docs = WordOfDoc.objects.filter(doc_id=select_file_id)
@@ -83,19 +81,7 @@ def index(request):
             for i in word_filter:
                 for j in docs:
                     if i == j:
-                        print(i, ' + ', j)
                         arr.append(j)
-            # віджет тепер інший, тепер Get запит виглядає інакше i пагінація знову зломана
-
-            # paginator = Paginator(arr, 30)
-            # page = request.GET.get('page')
-            #
-            # try:
-            #     posts = paginator.page(page)
-            # except PageNotAnInteger:
-            #     posts = paginator.page(1)
-            # except EmptyPage:
-            #     posts = paginator.page(paginator.num_pages)
 
             context = {
                 'table': True,

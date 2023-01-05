@@ -76,7 +76,7 @@ WSGI_APPLICATION = 'find.wsgi.application'
 
 DATABASES = {
     'default': {
-        'NAME': 'docs',
+        'NAME': 'doc_db',
         'ENGINE': 'django.db.backends.postgresql',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
