@@ -50,7 +50,8 @@
           <div class="collapse navbar-collapse">
         <form method="GET" class="d-flex">
             <ul class="navbar-nav me-auto mb-2 mb-sm-0">
-            <input class="form-control me-2" style="width: 600px;" type="text" name="q" value="{{ request.GET.q }}" placeholder="Search" aria-label="Search">
+            <input class="form-control me-2" onkeypress="if(this.value.length <= 100){ this.style.width = ((20 + this.value.length + 1) * 8) + 'px';}
+                " type="text" name="q" value="{{ request.GET.q }}" placeholder="Search" aria-label="Search">
             <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false" style="color: white;">Search in ?</a>
             <ul class="dropdown-menu">
