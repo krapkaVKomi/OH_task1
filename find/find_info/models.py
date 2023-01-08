@@ -14,21 +14,21 @@ class File(models.Model):
 
 
 class Doc(models.Model):
-    name = models.CharField(max_length=100, verbose_name='Назва', null=True)
-    updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата оновлення')
-    link = models.CharField(max_length=150, verbose_name='Посилання', blank=True)
+    name = models.CharField(max_length=100, verbose_name='Name', null=True)
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Updated at')
+    link = models.CharField(max_length=150, verbose_name='Storage location', blank=True)
 
     def __str__(self):
         return self.name
 
     class Meta:
-        verbose_name = 'Doc'
+        verbose_name = 'About document'
         ordering = ['name', 'updated_at', 'link']
 
 
 class LineOfDoc(models.Model):
-    line_number = models.IntegerField(verbose_name='Номер ряду')
-    text = models.CharField(max_length=600, verbose_name='Текст рядка')
+    line_number = models.IntegerField(verbose_name='Line number')
+    text = models.CharField(max_length=600, verbose_name='Line text')
     doc = models.ForeignKey(Doc, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
@@ -36,7 +36,7 @@ class LineOfDoc(models.Model):
 
 
 class WordOfDoc(models.Model):
-    text = models.CharField(max_length=100, verbose_name='Слово', db_index=True)
+    text = models.CharField(max_length=100, verbose_name='Word', db_index=True)
     line = models.ForeignKey(LineOfDoc, on_delete=models.CASCADE, null=True)
     doc = models.ForeignKey(Doc, on_delete=models.CASCADE, null=True)
 

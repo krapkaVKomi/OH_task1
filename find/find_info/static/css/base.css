@@ -1,0 +1,15 @@
+#branding h1 a:link, #branding h1 a:visited{
+    color: #ffffff
+}
+
+#header {
+color: #ffffff;
+}
+
+a:link, a:visited {
+    color: #212529a6;
+    text-decoration: none;
+    transition: color 0.15s, background 0.15s;
+}
+
+

@@ -23,3 +23,6 @@ admin.site.register(Doc, DocAdmin)
 admin.site.register(File, FileAdmin)
 admin.site.register(LineOfDoc, LineOfDocAdmin)
 admin.site.register(WordOfDoc, WordOfDocAdmin)
+
+admin.site.site_title = 'Admin panel FIND'
+admin.site.site_header = 'Admin panel FIND'

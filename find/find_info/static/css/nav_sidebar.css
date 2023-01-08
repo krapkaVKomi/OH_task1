@@ -1,0 +1,7 @@
+#nav-sidebar .current-model {
+    background: #ffffff
+}
+#nav-sidebar .current-app .section:link, #nav-sidebar .current-app .section:visited {
+    color: #ffffff;
+    font-weight: bold;
+}
