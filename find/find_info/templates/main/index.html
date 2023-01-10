@@ -15,63 +15,67 @@
 
 
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="\">FIND</a>
-      <div class="collapse navbar-collapse" id="navbarCollapse">
-        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-              {% if request.user.is_authenticated %}
-         <li> <a class="nav-link px-2 text-white" href="{% url 'logout' %}">logout</a></li>
-                {% else %}
-         <li> <a class="nav-link px-2 text-white" href="/register">Реєстрація</a></li>
-          <li><a class="nav-link px-2 text-white" href="/login">Авторизація</a></li>
-          {% endif %}
-        </ul>
-          <div class="collapse navbar-collapse">
-        <form method="GET" class="d-flex">
-            <ul class="navbar-nav me-auto mb-2 mb-sm-0">
-            <input class="form-control me-2" onkeypress="if(this.value.length <= 100){ this.style.width = ((25 + this.value.length + 1) * 8) + 'px';}" type="text" name="q" value="{{ request.GET.q }}" placeholder="Search" aria-label="Search">
-            <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false" style="color: white;">Search in ?</a>
-            <ul class="dropdown-menu">
-                {% if list_of_docs.docs %}
-                <div class="form-check" name="s">
-                {% for item in list_of_docs.docs %}
-                    <div>
-                      <input class="form-check-input" type="checkbox" name="{{ item.name }}" value="{{ item.name }}"  id="flexCheckDefault">
-                      <label class="form-check-label" for="flexCheckDefault">
-                        {{ item.name }}
-                      </label>
-                    </div>
-                     {% endfor %}
-                    </div>
-                <!-- Button trigger modal -->
-                <li><a class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#exampleModal" style="width: 100%;">Upload file</a></li>
-                {% else %}
-                <li><a class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#exampleModal" style="width: 100%;">Upload file</a></li>
-                {%endif%}
-            </ul>
-          </li>
-        </ul>
+    <div class="container">
+        <div class="row" style="width: 100%;">
+            <div class="col-1">
+                <a class="navbar-brand" href="\">FIND</a>
+            </div>
+        <div class="col-9">
+            <form method="GET" class="d-flex">
+                <input class="form-control me-2" style="width=100%" type="text" name="q" value="{{ request.GET.q }}" placeholder="Search" aria-label="Search">
+                <ul class="navbar-nav me-auto">
+                <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false" style="color: white;">Search in ?</a>
+                    <ul class="dropdown-menu">
+                        {% if list_of_docs.docs %}
+                        <div class="form-check" name="s">
+                        {% for item in list_of_docs.docs %}
+                            <div>
+                              <input class="form-check-input" type="checkbox" name="{{ item.name }}" value="{{ item.name }}"  id="flexCheckDefault">
+                              <label class="form-check-label" for="flexCheckDefault">
+                                {{ item.name }}
+                              </label>
+                            </div>
+                             {% endfor %}
+                        </div>
+                        <!-- Button trigger modal -->
+                        <li><a class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#exampleModal" style="width: 100%;">Upload file</a></li>
+                        {% else %}
+                        <li><a class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#exampleModal" style="width: 100%;">Upload file</a></li>
+                        {%endif%}
+                    </ul>
+                </li>
+                </ul>
             <button class="btn btn-dark" type="submit">
                 <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-</svg>
+                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>
             </button>
-        </form>
+            </form>
         </div>
-      </div>
+        <div class="col-1">
+                {% if request.user.is_authenticated %}
+                <a class="nav-link px-2 text-white" href="{% url 'logout' %}">logout</a>
+                {% else %}
+                <a class="nav-link px-2 text-white" href="/register">Реєстрація</a>
+                <a class="nav-link px-2 text-white" href="/login">Авторизація</a>
+                {% endif %}
+        </div>
+        <div class="col-1">
+              <a href="\admin" style="margin: 0px 0px 0px 10px; color: white;" >
+              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+              <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+              <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/></svg></a>
+        </div>
+
+        </div>
+    </div>
+</nav>
 
 
-    <a href="\admin" style="margin: 0px 0px 0px 10px; color: white;" >
-    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
-  <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
-  <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/></svg></a>
 
-    </nav>
 
 <div class="container text">
     <br><br><br>
-
   <!-- Modal -->
   <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -104,6 +108,10 @@
       </div>
     </div>
   </div>
+
+
+
+
 {% if table == True %}
             <table class="table">
       <thead>
