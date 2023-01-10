@@ -83,14 +83,45 @@ def index(request):
                     if i == j:
                         arr.append(j)
 
+            paginator = Paginator(arr, 40)  # 2 posts per page
+            page = request.GET.get('page')
+
+            try:
+                posts = paginator.page(page)
+            except PageNotAnInteger:
+                posts = paginator.page(1)
+            except EmptyPage:
+                posts = paginator.page(paginator.num_pages)
+
+            search = ''
+            for i in get_docs:
+                search += f"&{i}={i}"
+            print(paginator.page_range.stop)
+            print(page)
+
+            if page:
+                if paginator.page_range.stop > 10:
+                    page = f'{int(page)-1}:{int(page)+10}'
+
+                elif paginator.page_range.stop <= 10:
+                    page = f'{int(page)-1}:{paginator.page_range.stop}'
+
+            else:
+                page = f'0:10'
+
+
             context = {
+                'search': search,
                 'table': True,
-                'posts': arr,
+                'posts': posts,
+                'page': page,
                 'list_of_docs': list_of_docs
             }
             duration = datetime.now() - start
+            print(page)
             print('Виконання завершено!')
             print(f'Тривалість: {duration}')
+
             return render(request, "main/index.html", context)
 
         else:
