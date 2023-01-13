@@ -118,6 +118,8 @@
 
 
 {% if table == True %}
+
+    {% if posts %}
             <table class="table">
       <thead>
         <tr>
@@ -133,15 +135,14 @@
           <td>{{ word.line }}</td>
           <td>{{ word.line.line_number }}</td>
           <td>{{ word.line.doc.name }}</td>
-
         </tr>
-        {% endfor %}
-
-
+                {% endfor %}
       </tbody>
-
         </table>
 
+    {% else %}
+    <h1>Nothing found</h1>
+    {% endif %}
 {% endif %}
      {% if posts.has_other_pages %}
 
