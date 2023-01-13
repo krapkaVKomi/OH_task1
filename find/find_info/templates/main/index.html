@@ -97,19 +97,19 @@
         </div>
     {%endif%}
     <div id="fileform" style="display:flex;justify-content:center;align-items:center;margin-top: 10px;">
-        <form class="btn btn-dark" method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            <input style="color: white;" type="file" id="file" name="file" multiple />
-            <label for="your_name"></label>
-            <input placeholder="Input name for your file..." style="width: 80%;" id="your_name" type="text" name="your_name" maxlength="100" required>
-            <button type="submit">Submit</button>
-        </form>
-    </div>
+            <div class="mb-3">
+            <input class="form-control" type="file" id="formFile" name="file" multiple />
+            <label for="formFile" class="form-label"></label>
+            <input class="form-control" placeholder="Input name for your file..." style="width: 100%;" id="your_name" type="text" name="your_name" maxlength="100" required>
+            </div>
 
-        </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-success">Submit</button>
         </div>
+    </form>
+    </div>
       </div>
     </div>
   </div>
