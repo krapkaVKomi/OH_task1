@@ -83,7 +83,7 @@ def index(request):
                     if i == j:
                         arr.append(j)
 
-            paginator = Paginator(arr, 40)  # 2 posts per page
+            paginator = Paginator(arr, 40)  # 40 posts per page
             page = request.GET.get('page')
 
             try:
@@ -96,8 +96,6 @@ def index(request):
             search = ''
             for i in get_docs:
                 search += f"&{i}={i}"
-            print(paginator.page_range.stop)
-            print(page)
 
             if page:
                 if paginator.page_range.stop > 10:
@@ -107,7 +105,7 @@ def index(request):
                     page = f'{int(page)-1}:{paginator.page_range.stop}'
 
             else:
-                page = f'0:10'
+                page = f'1:10'
 
 
             context = {
@@ -115,10 +113,11 @@ def index(request):
                 'table': True,
                 'posts': posts,
                 'page': page,
-                'list_of_docs': list_of_docs
+                'list_of_docs': list_of_docs,
+                'page_num': request.GET.get('page')
             }
+
             duration = datetime.now() - start
-            print(page)
             print('Виконання завершено!')
             print(f'Тривалість: {duration}')
 
@@ -137,10 +136,10 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, 'Реєстрація успішна')
+            messages.success(request, 'Registration is successful')
             return redirect('/')
         else:
-            messages.error(request, 'Помилка реєстрації')
+            messages.error(request, 'Registration error')
     else:
         form = UserCreationForm()
     return render(request, 'main/register.html', {"form": form})
