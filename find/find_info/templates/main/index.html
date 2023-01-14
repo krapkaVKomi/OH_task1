@@ -76,12 +76,7 @@
     </div>
 </nav>
 
-
-
-
-<div class="container text">
-    <br><br><br>
-  <!-- Modal -->
+ <!-- Modal -->
   <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -89,61 +84,65 @@
           <h5 class="modal-title" id="exampleModalLabel">Upload your file here</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
+            <div class="modal-body">
 
-            {% if doc_path%}
-        <div style="display:flex;justify-content:center;align-items:center;margin-top: 10px;">
-            <a href="{{audio_path}}">{{doc_path}}</a>
-        </div>
-    {%endif%}
-    <div id="fileform" style="display:flex;justify-content:center;align-items:center;margin-top: 10px;">
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="mb-3">
-            <input class="form-control" type="file" id="formFile" name="file" multiple />
-            <label for="formFile" class="form-label"></label>
-            <input class="form-control" placeholder="Input name for your file..." style="width: 100%;" id="your_name" type="text" name="your_name" maxlength="100" required>
+                {% if doc_path%}
+                <div style="display:flex;justify-content:center;align-items:center;margin-top: 10px;">
+                <a href="{{audio_path}}">{{doc_path}}</a>
+                </div>
+                {%endif%}
+                    <div id="fileform" style="display:flex;justify-content:center;align-items:center;margin-top: 10px;">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                        <input class="form-control" type="file" id="formFile" name="file" multiple />
+                        <label for="formFile" class="form-label"></label>
+                        <input class="form-control" placeholder="Input name for your file..." style="width: 100%;" id="your_name" type="text" name="your_name" maxlength="100" required>
+                        </div>
+
+                        <div class="modal-footer">
+                          <button type="submit" class="btn btn-success">Submit</button>
+                        </div>
+                    </form>
+                    </div>
+                </div>
             </div>
-
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-success">Submit</button>
         </div>
-    </form>
-    </div>
       </div>
-    </div>
-  </div>
 
 
-
+<div class="container text"><br><br><br>
 
 {% if table == True %}
 
-    {% if posts %}
-            <table class="table">
-      <thead>
-        <tr>
-          <th>Word from line</th>
-          <th>Line number</th>
-          <th>Document name</th>
-        </tr>
-      </thead>
+        {% if posts %}
+                <table class="table">
+          <thead>
+            <tr>
+              <th>Word from line</th>
+              <th>Line number</th>
+              <th>Document name</th>
+            </tr>
+          </thead>
 
-      <tbody>
-        {% for word in posts %}
-        <tr>
-          <td>{{ word.line }}</td>
-          <td>{{ word.line.line_number }}</td>
-          <td>{{ word.line.doc.name }}</td>
-        </tr>
-                {% endfor %}
-      </tbody>
-        </table>
+          <tbody>
+            {% for word in posts %}
+            <tr>
+              <td>{{ word.line }}</td>
+              <td>{{ word.line.line_number }}</td>
+              <td>{{ word.line.doc.name }}</td>
+            </tr>
+                    {% endfor %}
+          </tbody>
+            </table>
 
-    {% else %}
-    <h1>Nothing found</h1>
-    {% endif %}
+        {% else %}
+        <h1>Nothing found</h1>
+        {% endif %}
+
 {% endif %}
+
+</div>
      {% if posts.has_other_pages %}
 
     <nav aria-label="Page navigation example">
@@ -184,13 +183,9 @@
 </nav>
 
 
-
-
-
-
 {% endif %}
 
 
-        </div>
+
     </body>
 </html>

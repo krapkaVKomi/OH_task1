@@ -72,18 +72,9 @@ def index(request):
                 select_file_id = Doc.objects.filter(name=doc)[0:]
                 select_file_id = select_file_id.values('id').get()
                 select_file_id = select_file_id['id']
-                words_filter_docs = WordOfDoc.objects.filter(doc_id=select_file_id)
-                for i in words_filter_docs:
-                    docs.append(i)
+                line_of_tible = WordOfDoc.objects.filter(doc_id=select_file_id) & WordOfDoc.objects.filter(text=query)
 
-            word_filter = WordOfDoc.objects.filter(text=query)
-            arr = []
-            for i in word_filter:
-                for j in docs:
-                    if i == j:
-                        arr.append(j)
-
-            paginator = Paginator(arr, 40)  # 40 posts per page
+            paginator = Paginator(line_of_tible, 30)  # 30 posts per page
             page = request.GET.get('page')
 
             try:
@@ -106,7 +97,6 @@ def index(request):
 
             else:
                 page = f'1:10'
-
 
             context = {
                 'search': search,
