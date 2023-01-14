@@ -67,14 +67,16 @@ def index(request):
                 get_docs.append(select_file)
 
         if query:
-            docs = []
+            all = []
             for doc in get_docs:
                 select_file_id = Doc.objects.filter(name=doc)[0:]
                 select_file_id = select_file_id.values('id').get()
                 select_file_id = select_file_id['id']
-                line_of_tible = WordOfDoc.objects.filter(doc_id=select_file_id) & WordOfDoc.objects.filter(text=query)
+                lines_of_tible = WordOfDoc.objects.filter(doc_id=select_file_id) & WordOfDoc.objects.filter(text=query)
+                for i in lines_of_tible:
+                    all.append(i)
 
-            paginator = Paginator(line_of_tible, 30)  # 30 posts per page
+            paginator = Paginator(all, 30)  # 30 posts per page
             page = request.GET.get('page')
 
             try:
