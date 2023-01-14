@@ -12,6 +12,9 @@ from datetime import datetime
 
 @login_required
 def index(request):
+    checkboxs = Checkbox.objects.filter(user=request.user.id).order_by('-pk')[0]
+    checkboxs = checkboxs.session
+
     if request.method == "POST":
         doc = request.FILES["file"]
         doc_type = doc.name.split('.')
@@ -54,17 +57,47 @@ def index(request):
     else:
         start = datetime.now()
         docs = Doc.objects.all()
-        if len(docs) != 0:
-            list_of_docs = {'docs': docs}
-        else:
-            list_of_docs = {'docs': False}
-        query = request.GET.get('q')
         get_docs = []
 
         for item in docs:
             select_file = request.GET.get(str(item))
             if select_file:
                 get_docs.append(select_file)
+
+        if len(docs) != 0:
+            doc_arr = []
+
+            if get_docs:
+                checkboxs = get_docs
+                for i in docs:
+                    if i.name not in checkboxs:
+                        doc_arr.append(i.name)
+
+            else:
+                for i in docs:
+                    if i.name not in checkboxs:
+                        doc_arr.append(i.name)
+                checkboxs = str(checkboxs)[1:-1]
+                checkboxs = checkboxs.replace("'", "").split(', ')
+                print(type(checkboxs), checkboxs, len(checkboxs))
+
+            print(checkboxs)
+
+            if len(checkboxs)>1:
+                #print(checkboxs)
+                print(doc_arr)
+                list_of_docs = {'docs': doc_arr,
+                                'checkboxs': checkboxs}
+            else:
+                list_of_docs = {'docs': docs,
+                                'checkboxs': False}
+        else:
+            list_of_docs = {'docs': False}
+
+
+        query = request.GET.get('q')
+        if query:
+            session = Checkbox.objects.create(user=request.user.id, session=get_docs)
 
         if query:
             all = []

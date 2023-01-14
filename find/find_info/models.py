@@ -43,3 +43,8 @@ class WordOfDoc(models.Model):
     def __str__(self):
         return self.text
 
+
+class Checkbox(models.Model):
+    user = models.CharField(max_length=100, verbose_name='User')
+    session = models.TextField(blank=True)
+
