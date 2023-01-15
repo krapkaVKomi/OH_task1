@@ -13,7 +13,8 @@ from datetime import datetime
 @login_required
 def index(request):
     checkboxs = Checkbox.objects.filter(user=request.user.id).order_by('-pk')[0]
-    checkboxs = checkboxs.session
+    checkboxs = str(checkboxs.session)[1:-1]
+    checkboxs = checkboxs.replace("'", "").split(', ')
 
     if request.method == "POST":
         doc = request.FILES["file"]
@@ -77,14 +78,18 @@ def index(request):
                 for i in docs:
                     if i.name not in checkboxs:
                         doc_arr.append(i.name)
-                checkboxs = str(checkboxs)[1:-1]
-                checkboxs = checkboxs.replace("'", "").split(', ')
 
-            if len(checkboxs) > 0:
+
+            if len(checkboxs) != 0:
+                print(doc_arr)
+                print(checkboxs)
                 list_of_docs = {'docs': doc_arr,
                                 'checkboxs': checkboxs}
             else:
-                list_of_docs = {'docs': docs,
+                arr = []
+                for i in docs:
+                    arr.append(i.name)
+                list_of_docs = {'docs': arr,
                                 'checkboxs': False}
         else:
             list_of_docs = {'docs': False}
@@ -102,15 +107,12 @@ def index(request):
                 select_file_id = select_file_id.values('id').get()
                 select_file_id = select_file_id['id']
 
-                count_in_doc = (WordOfDoc.objects.filter(doc_id=select_file_id) & WordOfDoc.objects.filter(text=query)).count()
+                #count_in_doc = (WordOfDoc.objects.filter(doc_id=select_file_id) & WordOfDoc.objects.filter(text=query)).count()
 
-                if page is None:
-                    lines_of_tible = WordOfDoc.objects.filter(doc_id=select_file_id) & WordOfDoc.objects.filter(text=query)
-                    for i in lines_of_tible:
-                        all.append(i)
+                lines_of_tible = WordOfDoc.objects.filter(doc_id=select_file_id) & WordOfDoc.objects.filter(text=query)
+                for i in lines_of_tible:
+                    all.append(i)
 
-                else:
-                    print('else')
 
             paginator = Paginator(all, 30)  # 30 posts per page
 
