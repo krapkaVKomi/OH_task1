@@ -79,13 +79,8 @@ def index(request):
                         doc_arr.append(i.name)
                 checkboxs = str(checkboxs)[1:-1]
                 checkboxs = checkboxs.replace("'", "").split(', ')
-                print(type(checkboxs), checkboxs, len(checkboxs))
 
-            print(checkboxs)
-
-            if len(checkboxs)>1:
-                #print(checkboxs)
-                print(doc_arr)
+            if len(checkboxs) > 0:
                 list_of_docs = {'docs': doc_arr,
                                 'checkboxs': checkboxs}
             else:
@@ -94,10 +89,11 @@ def index(request):
         else:
             list_of_docs = {'docs': False}
 
-
         query = request.GET.get('q')
-        if query:
+        if get_docs:
             session = Checkbox.objects.create(user=request.user.id, session=get_docs)
+
+        page = request.GET.get('page')
 
         if query:
             all = []
@@ -105,12 +101,19 @@ def index(request):
                 select_file_id = Doc.objects.filter(name=doc)[0:]
                 select_file_id = select_file_id.values('id').get()
                 select_file_id = select_file_id['id']
-                lines_of_tible = WordOfDoc.objects.filter(doc_id=select_file_id) & WordOfDoc.objects.filter(text=query)
-                for i in lines_of_tible:
-                    all.append(i)
+
+                count_in_doc = (WordOfDoc.objects.filter(doc_id=select_file_id) & WordOfDoc.objects.filter(text=query)).count()
+
+                if page is None:
+                    lines_of_tible = WordOfDoc.objects.filter(doc_id=select_file_id) & WordOfDoc.objects.filter(text=query)
+                    for i in lines_of_tible:
+                        all.append(i)
+
+                else:
+                    print('else')
 
             paginator = Paginator(all, 30)  # 30 posts per page
-            page = request.GET.get('page')
+
 
             try:
                 posts = paginator.page(page)
@@ -139,7 +142,7 @@ def index(request):
                 'posts': posts,
                 'page': page,
                 'list_of_docs': list_of_docs,
-                'page_num': request.GET.get('page')
+                'page_num': page
             }
 
             duration = datetime.now() - start
