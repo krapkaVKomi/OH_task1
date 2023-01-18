@@ -32,29 +32,27 @@
                         {% if list_of_docs %}
 
                         {% if list_of_docs.checkboxs %}
-                        {% for item in list_of_docs.checkboxs %}
-                                <div>
-                                    <input class="form-check-input" type="checkbox" name="{{ item }}" value="{{ item }}"  id="flexChecked" checked>
-                                    <label class="form-check-label" for="flexCheckDefault">{{ item }}</label>
-                                </div>
-                                    {% endfor %}
-                                      {%endif%}
+                            {% for item in list_of_docs.checkboxs %}
+                                    <a class="dropdown-item" name="s">
+                                        <input class="form-check-input" type="checkbox" name="{{ item }}" value="{{ item }}"  id="flexChecked" checked>
+                                        <label class="form-check-label" for="flexCheckDefault">{{ item }}</label>
+                                    </a>
+                            {% endfor %}
+                         {%endif%}
 
-                        <div class="form-check" name="s">
                         {% for item in list_of_docs.docs %}
-                            <div>
+        					<a class="dropdown-item" name="s">
                               <input class="form-check-input" type="checkbox" name="{{ item }}" value="{{ item }}"  id="flexCheckDefault">
                               <label class="form-check-label" for="flexCheckDefault">
                                 {{ item }}
                               </label>
-                            </div>
-                             {% endfor %}
-                        </div>
-
+        					</a>
+                        {% endfor %}
+                        <div class="dropdown-divider"></div>
                         <!-- Button trigger modal -->
-                        <li><a class="btn btn-light" data-bs-toggle="modal" data-bs-target="#exampleModal" style="width: 100%; background-color: white;">Upload file</a></li>
+                        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal" style="width: 100%; background-color: white;">Upload file</a></li>
                         {% else %}
-                        <li><a class="btn btn-light" data-bs-toggle="modal" data-bs-target="#exampleModal" style="width: 100%; background-color: white;">Upload file</a></li>
+                        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal" style="width: 100%; background-color: white;">Upload file</a></li>
                         {%endif%}
                     </ul>
                 </li>

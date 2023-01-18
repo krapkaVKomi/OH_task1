@@ -8,25 +8,46 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from .forms import UserLoginForm, NameForm
 from datetime import datetime
+import docx
+from chardet.universaldetector import UniversalDetector
+
+
+def encoding(path):
+    detector = UniversalDetector()
+    with open(path, 'rb') as fh:
+        for line in fh:
+            detector.feed(line)
+            if detector.done:
+                break
+        detector.close()
+
+    return detector.result['encoding']
 
 
 @login_required
 def index(request):
-    checkboxs = Checkbox.objects.filter(user=request.user.id).order_by('-pk')[0]
-    checkboxs = str(checkboxs.session)[1:-1]
-    checkboxs = checkboxs.replace("'", "").split(', ')
+    try:
+        checkboxs = Checkbox.objects.filter(user=request.user.id).order_by('-pk')[0]
+    except IndexError:
+        checkboxs = None
+
+    if checkboxs:
+        checkboxs = str(checkboxs.session)[1:-1]
+        checkboxs = checkboxs.replace("'", "").split(', ')
 
     if request.method == "POST":
         doc = request.FILES["file"]
         doc_type = doc.name.split('.')
         doc_type = doc_type[-1]
+
         if doc_type == 'txt':
             form_doc_name = NameForm(request.POST)
             doc_name = form_doc_name['your_name'].value()
             doc_file = File.objects.create(name=doc.name, file=doc)
             doc_path = doc_file.file.path
             document = Doc.objects.create(name=doc_name, link=doc_path)
-            with open(doc_path, 'r', encoding="utf-8") as txt:
+            encod = encoding(path=doc_path)
+            with open(doc_path, 'r', encoding=encod) as txt:
                 line_count = 1
                 for line in txt:
                     words = line.strip() \
@@ -53,6 +74,41 @@ def index(request):
             render(request, "main/index.html", {"doc_path": doc_path})
             return redirect('/')
 
+        elif doc_type == 'docx':
+            form_doc_name = NameForm(request.POST)
+            doc_name = form_doc_name['your_name'].value()
+            doc_file = File.objects.create(name=doc.name, file=doc)
+            doc_path = doc_file.file.path
+            document = Doc.objects.create(name=doc_name, link=doc_path)
+            doc = docx.Document(doc_path)
+            line_count = 1
+            for i in range(len(doc.paragraphs)):
+                line = doc.paragraphs[i].text
+                words = line.strip() \
+                    .replace('\t', '') \
+                    .replace('.', '') \
+                    .replace(',', '') \
+                    .replace('!', '') \
+                    .replace('?', '') \
+                    .replace('  ', ' ').split(' ')
+
+                words_of_line = []
+                line = ''
+                for word in words:
+                    word = word.strip()
+                    if len(word) > 3:
+                        words_of_line.append(word)
+                        line += word + ' '
+
+                line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
+                line_count += 1
+                line = line.split(' ')
+                for word in line:
+                    WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
+
+            render(request, "main/index.html", {"doc_path": doc_path})
+            return redirect('/')
+
         else:
             print("ПОМИЛКА ", doc_type)
     else:
@@ -75,16 +131,19 @@ def index(request):
                         doc_arr.append(i.name)
 
             else:
-                for i in docs:
-                    if i.name not in checkboxs:
+                if checkboxs:
+                    for i in docs:
+                        if i.name not in checkboxs:
+                            doc_arr.append(i.name)
+                else:
+                    for i in docs:
                         doc_arr.append(i.name)
 
 
-            if len(checkboxs) != 0:
-                print(doc_arr)
-                print(checkboxs)
+            if checkboxs != None and len(checkboxs) != 0:
                 list_of_docs = {'docs': doc_arr,
                                 'checkboxs': checkboxs}
+
             else:
                 arr = []
                 for i in docs:
@@ -92,7 +151,7 @@ def index(request):
                 list_of_docs = {'docs': arr,
                                 'checkboxs': False}
         else:
-            list_of_docs = {'docs': False}
+            list_of_docs = None # {'docs': False}
 
         query = request.GET.get('q')
         if get_docs:
@@ -113,9 +172,7 @@ def index(request):
                 for i in lines_of_tible:
                     all.append(i)
 
-
             paginator = Paginator(all, 30)  # 30 posts per page
-
 
             try:
                 posts = paginator.page(page)
