@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
-from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -9,19 +8,6 @@ from django.contrib import messages
 from .forms import UserLoginForm, NameForm
 from datetime import datetime
 import docx
-from chardet.universaldetector import UniversalDetector
-
-
-def encoding(path):
-    detector = UniversalDetector()
-    with open(path, 'rb') as fh:
-        for line in fh:
-            detector.feed(line)
-            if detector.done:
-                break
-        detector.close()
-
-    return detector.result['encoding']
 
 
 @login_required
@@ -46,8 +32,7 @@ def index(request):
             doc_file = File.objects.create(name=doc.name, file=doc)
             doc_path = doc_file.file.path
             document = Doc.objects.create(name=doc_name, link=doc_path)
-            encod = encoding(path=doc_path)
-            with open(doc_path, 'r', encoding=encod) as txt:
+            with open(doc_path, 'r', encoding="utf-8") as txt:
                 line_count = 1
                 for line in txt:
                     words = line.strip() \
@@ -59,12 +44,11 @@ def index(request):
                         .replace('  ', ' ').split(' ')
 
                     words_of_line = []
-                    line = ''
+
                     for word in words:
                         word = word.strip()
                         if len(word) > 3:
                             words_of_line.append(word)
-                            line += word + ' '
 
                     line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
                     line_count += 1
@@ -93,12 +77,12 @@ def index(request):
                     .replace('  ', ' ').split(' ')
 
                 words_of_line = []
-                line = ''
+                # line = ''
                 for word in words:
                     word = word.strip()
                     if len(word) > 3:
                         words_of_line.append(word)
-                        line += word + ' '
+                        # line += word + ' '
 
                 line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
                 line_count += 1
@@ -112,7 +96,6 @@ def index(request):
         else:
             print("ПОМИЛКА ", doc_type)
     else:
-        start = datetime.now()
         docs = Doc.objects.all()
         get_docs = []
 
@@ -151,7 +134,7 @@ def index(request):
                 list_of_docs = {'docs': arr,
                                 'checkboxs': False}
         else:
-            list_of_docs = None # {'docs': False}
+            list_of_docs = None
 
         query = request.GET.get('q')
         if get_docs:
@@ -168,7 +151,7 @@ def index(request):
 
                 #count_in_doc = (WordOfDoc.objects.filter(doc_id=select_file_id) & WordOfDoc.objects.filter(text=query)).count()
 
-                lines_of_tible = WordOfDoc.objects.filter(doc_id=select_file_id) & WordOfDoc.objects.filter(text=query)
+                lines_of_tible = WordOfDoc.objects.filter(doc_id=select_file_id) & WordOfDoc.objects.filter(text__istartswith=query)
                 for i in lines_of_tible:
                     all.append(i)
 
@@ -187,7 +170,14 @@ def index(request):
 
             if page:
                 if paginator.page_range.stop > 10:
-                    page = f'{int(page)-1}:{int(page)+10}'
+                    start = f'{int(page)-1}'
+                    print(type(start))
+                    if start != '0':
+                        page = f'{start}:{int(page)+10}'
+
+                    else:
+                        page = f'{int(page)}:{int(page) + 10}'
+                    print(page, start)
 
                 elif paginator.page_range.stop <= 10:
                     page = f'{int(page)-1}:{paginator.page_range.stop}'
@@ -203,10 +193,6 @@ def index(request):
                 'list_of_docs': list_of_docs,
                 'page_num': page
             }
-
-            duration = datetime.now() - start
-            print('Виконання завершено!')
-            print(f'Тривалість: {duration}')
 
             return render(request, "main/index.html", context)
 
