@@ -6,8 +6,21 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from .forms import UserLoginForm, NameForm
-from datetime import datetime
+from chardet.universaldetector import UniversalDetector
 import docx
+import csv
+
+
+def encoding(path):
+    detector = UniversalDetector()
+    with open(path, 'rb') as fh:
+        for line in fh:
+            detector.feed(line)
+            if detector.done:
+                break
+        detector.close()
+
+    return detector.result['encoding']
 
 
 @login_required
@@ -26,13 +39,20 @@ def index(request):
         doc_type = doc.name.split('.')
         doc_type = doc_type[-1]
 
-        if doc_type == 'txt':
-            form_doc_name = NameForm(request.POST)
-            doc_name = form_doc_name['your_name'].value()
+        form_doc_name = NameForm(request.POST)
+        doc_name = form_doc_name['your_name'].value()
+        docs = Doc.objects.all()
+        status = True
+        for name in docs:
+            if str(name) == doc_name:
+                status = False
+
+        if status and doc_type == 'txt':
             doc_file = File.objects.create(name=doc.name, file=doc)
             doc_path = doc_file.file.path
             document = Doc.objects.create(name=doc_name, link=doc_path)
-            with open(doc_path, 'r', encoding="utf-8") as txt:
+            encod = encoding(path=doc_path)
+            with open(doc_path, 'r', encoding=encod) as txt:
                 line_count = 1
                 for line in txt:
                     words = line.strip() \
@@ -58,9 +78,7 @@ def index(request):
             render(request, "main/index.html", {"doc_path": doc_path})
             return redirect('/')
 
-        elif doc_type == 'docx':
-            form_doc_name = NameForm(request.POST)
-            doc_name = form_doc_name['your_name'].value()
+        elif status and doc_type == 'docx':
             doc_file = File.objects.create(name=doc.name, file=doc)
             doc_path = doc_file.file.path
             document = Doc.objects.create(name=doc_name, link=doc_path)
@@ -93,8 +111,43 @@ def index(request):
             render(request, "main/index.html", {"doc_path": doc_path})
             return redirect('/')
 
+        elif status and doc_type == 'csv':
+            doc_file = File.objects.create(name=doc.name, file=doc)
+            doc_path = doc_file.file.path
+            document = Doc.objects.create(name=doc_name, link=doc_path)
+            encod = encoding(path=doc_path)
+            lines = []
+
+            with open(doc_path, 'r') as file:
+                csvreader = csv.reader(file)
+                for row in csvreader:
+                    lines.append(row[0])
+
+            line_count = 1
+            for line in lines:
+                words = line.strip() \
+                    .replace('\t', '') \
+                    .replace('.', '') \
+                    .replace(',', '') \
+                    .replace('!', '') \
+                    .replace('?', '') \
+                    .replace(';', '') \
+                    .replace('\n', '') \
+                    .replace('  ', ' ').split(' ')
+                print(line)
+                line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
+                print(words)
+                for word in words:
+                    print(word)
+                    WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
+                line_count += 1
+
+            render(request, "main/index.html", {"doc_path": doc_path})
+            return redirect('/')
+
         else:
-            print("ПОМИЛКА ", doc_type)
+            print("ПОМИЛКА ", doc_type, doc_name)
+            return redirect('/')
     else:
         docs = Doc.objects.all()
         get_docs = []
@@ -121,7 +174,6 @@ def index(request):
                 else:
                     for i in docs:
                         doc_arr.append(i.name)
-
 
             if checkboxs != None and len(checkboxs) != 0:
                 list_of_docs = {'docs': doc_arr,
@@ -171,13 +223,11 @@ def index(request):
             if page:
                 if paginator.page_range.stop > 10:
                     start = f'{int(page)-1}'
-                    print(type(start))
                     if start != '0':
                         page = f'{start}:{int(page)+10}'
 
                     else:
                         page = f'{int(page)}:{int(page) + 10}'
-                    print(page, start)
 
                 elif paginator.page_range.stop <= 10:
                     page = f'{int(page)-1}:{paginator.page_range.stop}'
