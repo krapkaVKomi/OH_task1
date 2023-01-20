@@ -224,7 +224,10 @@ def index(request):
                 if paginator.page_range.stop > 10:
                     start = f'{int(page)-1}'
                     if start != '0':
-                        page = f'{start}:{int(page)+10}'
+                        if paginator.page_range.stop - int(page) > 10:
+                            page = f'{start}:{int(page)+10}'
+                        else:
+                            page = f'{paginator.page_range.stop - 10}:{paginator.page_range.stop}'
 
                     else:
                         page = f'{int(page)}:{int(page) + 10}'
