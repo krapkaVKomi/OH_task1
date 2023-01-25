@@ -170,6 +170,9 @@ def index(request):
                         if len(word) > 3:
                             WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
 
+            render(request, "main/index.html", {"doc_path": doc_path})
+            return redirect('/')
+
         else:
             print("ПОМИЛКА ", doc_type, doc_name)
             return redirect('/')
@@ -313,29 +316,5 @@ def user_logout(request):
     return redirect('/')
 
 
-#class TaskList(View):
-
-#    def get(self, request):
-#        return render(request, 'main/test.html')
 
 
-def todos(request):
-    print(request)
-    # request.is_ajax() is deprecated since django 3.1
-    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
-
-    if is_ajax:
-        if request.method == 'GET':
-            print(request.method, ')) GET')
-            todos = list(WordOfDoc.objects.all().values())
-            return JsonResponse({'context': todos})
-        if request.method == 'POST':
-            print(request.method, ')) POST')
-            data = json.load(request)
-            todo = data.get('payload')
-            WordOfDoc.objects.create(task=todo['task'], completed=todo['completed'])
-            return JsonResponse({'status': 'Todo added!'})
-        return JsonResponse({'status': 'Invalid request'}, status=400)
-    else:
-        # return HttpResponseBadRequest('Invalid request')
-        return render(request, 'main/test.html')
