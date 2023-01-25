@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
+from django.views.generic import View
 from .models import *
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth import login, logout
@@ -7,6 +8,9 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from .forms import UserLoginForm, NameForm
 from chardet.universaldetector import UniversalDetector
+from django.http import HttpResponseBadRequest, JsonResponse
+from PyPDF2 import PdfReader
+import json
 import docx
 import csv
 
@@ -46,6 +50,7 @@ def index(request):
         for name in docs:
             if str(name) == doc_name:
                 status = False
+                break
 
         if status and doc_type == 'txt':
             doc_file = File.objects.create(name=doc.name, file=doc)
@@ -95,12 +100,10 @@ def index(request):
                     .replace('  ', ' ').split(' ')
 
                 words_of_line = []
-                # line = ''
                 for word in words:
                     word = word.strip()
                     if len(word) > 3:
                         words_of_line.append(word)
-                        # line += word + ' '
 
                 line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
                 line_count += 1
@@ -118,7 +121,7 @@ def index(request):
             encod = encoding(path=doc_path)
             lines = []
 
-            with open(doc_path, 'r') as file:
+            with open(doc_path, 'r', encoding=encod) as file:
                 csvreader = csv.reader(file)
                 for row in csvreader:
                     lines.append(row[0])
@@ -134,16 +137,38 @@ def index(request):
                     .replace(';', '') \
                     .replace('\n', '') \
                     .replace('  ', ' ').split(' ')
-                print(line)
                 line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
-                print(words)
                 for word in words:
-                    print(word)
                     WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
                 line_count += 1
 
             render(request, "main/index.html", {"doc_path": doc_path})
             return redirect('/')
+
+        elif status and doc_type == 'pdf':
+            doc_file = File.objects.create(name=doc.name, file=doc)
+            doc_path = doc_file.file.path
+            document = Doc.objects.create(name=doc_name, link=doc_path)
+            reader = PdfReader(doc_path)
+
+            number_of_pages = len(reader.pages)
+            for i in range(number_of_pages):
+                page = reader.pages[i]
+                lines_of_page = page.extract_text().split('\n')
+                line_count = 1
+                for line in lines_of_page:
+                    line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
+                    line_count += 1
+                    line = line.strip() \
+                        .replace('\t', '') \
+                        .replace('.', '') \
+                        .replace(',', '') \
+                        .replace('!', '') \
+                        .replace('?', '') \
+                        .replace('  ', ' ').split(' ')
+                    for word in line:
+                        if len(word) > 3:
+                            WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
 
         else:
             print("ПОМИЛКА ", doc_type, doc_name)
@@ -286,3 +311,31 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     return redirect('/')
+
+
+#class TaskList(View):
+
+#    def get(self, request):
+#        return render(request, 'main/test.html')
+
+
+def todos(request):
+    print(request)
+    # request.is_ajax() is deprecated since django 3.1
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+    if is_ajax:
+        if request.method == 'GET':
+            print(request.method, ')) GET')
+            todos = list(WordOfDoc.objects.all().values())
+            return JsonResponse({'context': todos})
+        if request.method == 'POST':
+            print(request.method, ')) POST')
+            data = json.load(request)
+            todo = data.get('payload')
+            WordOfDoc.objects.create(task=todo['task'], completed=todo['completed'])
+            return JsonResponse({'status': 'Todo added!'})
+        return JsonResponse({'status': 'Invalid request'}, status=400)
+    else:
+        # return HttpResponseBadRequest('Invalid request')
+        return render(request, 'main/test.html')
