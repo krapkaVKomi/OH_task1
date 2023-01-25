@@ -10,6 +10,7 @@ from .forms import UserLoginForm, NameForm
 from chardet.universaldetector import UniversalDetector
 from django.http import HttpResponseBadRequest, JsonResponse
 from PyPDF2 import PdfReader
+from datetime import datetime
 import json
 import docx
 import csv
@@ -49,7 +50,7 @@ def index(request):
         status = True
         for name in docs:
             if str(name) == doc_name:
-                status = False
+                doc_name = doc_name + ' (' + str(datetime.now()) + ')'
                 break
 
         if status and doc_type == 'txt':
@@ -314,7 +315,4 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     return redirect('/')
-
-
-
 
