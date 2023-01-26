@@ -14,6 +14,7 @@ from datetime import datetime
 import json
 import docx
 import csv
+import openpyxl
 
 
 def encoding(path):
@@ -174,6 +175,39 @@ def index(request):
             render(request, "main/index.html", {"doc_path": doc_path})
             return redirect('/')
 
+        elif status and doc_type == 'xlsx':
+            doc_file = File.objects.create(name=doc.name, file=doc)
+            doc_path = doc_file.file.path
+            document = Doc.objects.create(name=doc_name, link=doc_path)
+
+            wookbook = openpyxl.load_workbook(doc_path)
+
+            line_count = 1
+            for el in wookbook.worksheets:
+                print(el)
+                for i in range(0, el.max_row):
+                    line = ''
+                    for col in el.iter_cols(1, el.max_column):
+                        if col[i].value != None:
+                            box = str(col[i].value) + ' '
+                            line += box
+                    line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
+                    line = line.strip() \
+                        .replace('\t', '') \
+                        .replace('.', '') \
+                        .replace(',', '') \
+                        .replace('!', '') \
+                        .replace('?', '') \
+                        .replace('  ', ' ').split(' ')
+                    for word in line:
+                        if len(word) > 3:
+                            print(word)
+                            WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
+                    print(line)
+                    line_count += 1
+            render(request, "main/index.html", {"doc_path": doc_path})
+            return redirect('/')
+
         else:
             print("ПОМИЛКА ", doc_type, doc_name)
             return redirect('/')
@@ -315,4 +349,5 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     return redirect('/')
+
 
