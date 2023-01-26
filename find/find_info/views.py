@@ -11,6 +11,7 @@ from chardet.universaldetector import UniversalDetector
 from django.http import HttpResponseBadRequest, JsonResponse
 from PyPDF2 import PdfReader
 from datetime import datetime
+from xlrd import open_workbook
 import json
 import docx
 import csv
@@ -203,8 +204,40 @@ def index(request):
                         if len(word) > 3:
                             print(word)
                             WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
-                    print(line)
                     line_count += 1
+            render(request, "main/index.html", {"doc_path": doc_path})
+            return redirect('/')
+
+        elif status and doc_type == 'xls':
+            doc_file = File.objects.create(name=doc.name, file=doc)
+            doc_path = doc_file.file.path
+            document = Doc.objects.create(name=doc_name, link=doc_path)
+            encod = encoding(doc_path)
+            wb = open_workbook(doc_path, encoding_override=encod)
+
+            for s in wb.sheets():
+                for row in range(s.nrows):
+                    line = ''
+                    line_count = 1
+                    for col in range(s.ncols):
+                        items = s.cell(row, col).value
+                        item = ''.join(str(items).replace('\n', ' '))
+                        line += item + ' '
+                    line_count += 1
+                    line_of_doc = LineOfDoc.objects.create(text=line.strip(), doc=document, line_number=line_count)
+                    line = line.strip() \
+                        .replace('\t', '') \
+                        .replace('.', '') \
+                        .replace(',', '') \
+                        .replace('!', '') \
+                        .replace('?', '') \
+                        .replace('  ', ' ').split(' ')
+
+                    for word in line:
+                        if len(word) > 3:
+                            print(word)
+                            WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
+
             render(request, "main/index.html", {"doc_path": doc_path})
             return redirect('/')
 
@@ -349,5 +382,4 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     return redirect('/')
-
 
