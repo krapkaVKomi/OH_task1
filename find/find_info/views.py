@@ -62,13 +62,13 @@ def index(request):
         form_doc_name = NameForm(request.POST)
         doc_name = form_doc_name['your_name'].value()
         docs = Doc.objects.all()
-        status = True
+
         for name in docs:
             if str(name) == doc_name:
                 doc_name = doc_name + ' (' + str(datetime.now()) + ')'
                 break
 
-        if status and doc_type == 'txt':
+        if doc_type == 'txt':
             doc_file = File.objects.create(name=doc.name, file=doc)
             doc_path = doc_file.file.path
             document = Doc.objects.create(name=doc_name, link=doc_path)
@@ -91,21 +91,17 @@ def index(request):
             render(request, "main/index.html", {"doc_path": doc_path})
             return redirect('/')
 
-        elif status and doc_type == 'docx' or doc_type == 'doc':
+        elif doc_type == 'docx' or doc_type == 'doc':
             doc_file = File.objects.create(name=doc.name, file=doc)
             doc_path = doc_file.file.path
             document = Doc.objects.create(name=doc_name, link=doc_path)
 
             if doc_type == 'doc':
-                # Load the PDF document from the disc.
                 doc = aw.Document(doc_path)
                 doc_path = doc_path.split('\\')
                 doc_path[-1] = f"{doc_name}.docx"
                 doc_path = '/'.join(doc_path)
-                # Save the document to DOCX format.
-                #print(doc_name, doc_path)
                 doc.save(doc_path)
-                #print(doc_path)
 
             doc = docx.Document(doc_path)
             line_count = 1
@@ -130,7 +126,7 @@ def index(request):
             render(request, "main/index.html", {"doc_path": doc_path})
             return redirect('/')
 
-        elif status and doc_type == 'csv':
+        elif doc_type == 'csv':
             doc_file = File.objects.create(name=doc.name, file=doc)
             doc_path = doc_file.file.path
             document = Doc.objects.create(name=doc_name, link=doc_path)
@@ -153,7 +149,7 @@ def index(request):
             render(request, "main/index.html", {"doc_path": doc_path})
             return redirect('/')
 
-        elif status and doc_type == 'pdf':
+        elif doc_type == 'pdf':
             doc_file = File.objects.create(name=doc.name, file=doc)
             doc_path = doc_file.file.path
             document = Doc.objects.create(name=doc_name, link=doc_path)
@@ -175,11 +171,10 @@ def index(request):
             render(request, "main/index.html", {"doc_path": doc_path})
             return redirect('/')
 
-        elif status and doc_type == 'xlsx':
+        elif doc_type == 'xlsx':
             doc_file = File.objects.create(name=doc.name, file=doc)
             doc_path = doc_file.file.path
             document = Doc.objects.create(name=doc_name, link=doc_path)
-
             wookbook = openpyxl.load_workbook(doc_path)
 
             line_count = 1
@@ -199,7 +194,7 @@ def index(request):
             render(request, "main/index.html", {"doc_path": doc_path})
             return redirect('/')
 
-        elif status and doc_type == 'xls':
+        elif doc_type == 'xls' or doc_type =='XLS':
             doc_file = File.objects.create(name=doc.name, file=doc)
             doc_path = doc_file.file.path
             document = Doc.objects.create(name=doc_name, link=doc_path)
@@ -256,15 +251,13 @@ def index(request):
                         doc_arr.append(i.name)
 
             if checkboxs != None and len(checkboxs) != 0:
-                list_of_docs = {'docs': doc_arr,
-                                'checkboxs': checkboxs}
+                list_of_docs = {'docs': doc_arr, 'checkboxs': checkboxs}
 
             else:
                 arr = []
                 for i in docs:
                     arr.append(i.name)
-                list_of_docs = {'docs': arr,
-                                'checkboxs': False}
+                list_of_docs = {'docs': arr, 'checkboxs': False}
         else:
             list_of_docs = None
 
@@ -330,9 +323,7 @@ def index(request):
             return render(request, "main/index.html", context)
 
         else:
-            context = {'table': False,
-                       'list_of_docs': list_of_docs
-                       }
+            context = {'table': False, 'list_of_docs': list_of_docs}
             return render(request, "main/index.html", context)
 
 
