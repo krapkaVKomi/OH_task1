@@ -12,6 +12,7 @@ from django.http import HttpResponseBadRequest, JsonResponse
 from PyPDF2 import PdfReader
 from datetime import datetime
 from xlrd import open_workbook
+import aspose.words as aw
 import json
 import docx
 import csv
@@ -26,8 +27,20 @@ def encoding(path):
             if detector.done:
                 break
         detector.close()
-
     return detector.result['encoding']
+
+
+def clear_text(line):
+    new_line = line.strip() \
+        .replace('\t', '') \
+        .replace('.', '') \
+        .replace(',', '') \
+        .replace('!', '') \
+        .replace('?', '') \
+        .replace(';', '') \
+        .replace('\n', '') \
+        .replace('  ', ' ').split(' ')
+    return new_line
 
 
 @login_required
@@ -63,16 +76,8 @@ def index(request):
             with open(doc_path, 'r', encoding=encod) as txt:
                 line_count = 1
                 for line in txt:
-                    words = line.strip() \
-                        .replace('\t', '') \
-                        .replace('.', '') \
-                        .replace(',', '') \
-                        .replace('!', '') \
-                        .replace('?', '') \
-                        .replace('  ', ' ').split(' ')
-
+                    words = clear_text(line)
                     words_of_line = []
-
                     for word in words:
                         word = word.strip()
                         if len(word) > 3:
@@ -86,22 +91,30 @@ def index(request):
             render(request, "main/index.html", {"doc_path": doc_path})
             return redirect('/')
 
-        elif status and doc_type == 'docx':
+        elif status and doc_type == 'docx' or doc_type == 'doc':
             doc_file = File.objects.create(name=doc.name, file=doc)
             doc_path = doc_file.file.path
             document = Doc.objects.create(name=doc_name, link=doc_path)
+
+            if doc_type == 'doc':
+                # Load the PDF document from the disc.
+                doc = aw.Document(doc_path)
+                doc_path = doc_path.split('\\')
+                doc_path[-1] = f"{doc_name}.docx"
+                doc_path = '/'.join(doc_path)
+                # Save the document to DOCX format.
+                #print(doc_name, doc_path)
+                doc.save(doc_path)
+                #print(doc_path)
+
             doc = docx.Document(doc_path)
             line_count = 1
             for i in range(len(doc.paragraphs)):
                 line = doc.paragraphs[i].text
-                words = line.strip() \
-                    .replace('\t', '') \
-                    .replace('.', '') \
-                    .replace(',', '') \
-                    .replace('!', '') \
-                    .replace('?', '') \
-                    .replace('  ', ' ').split(' ')
-
+                if doc_type == 'doc' and line_count == 1:
+                    line_count += 1
+                    continue
+                words = clear_text(line)
                 words_of_line = []
                 for word in words:
                     word = word.strip()
@@ -131,15 +144,7 @@ def index(request):
 
             line_count = 1
             for line in lines:
-                words = line.strip() \
-                    .replace('\t', '') \
-                    .replace('.', '') \
-                    .replace(',', '') \
-                    .replace('!', '') \
-                    .replace('?', '') \
-                    .replace(';', '') \
-                    .replace('\n', '') \
-                    .replace('  ', ' ').split(' ')
+                words = clear_text(line)
                 line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
                 for word in words:
                     WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
@@ -162,13 +167,7 @@ def index(request):
                 for line in lines_of_page:
                     line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
                     line_count += 1
-                    line = line.strip() \
-                        .replace('\t', '') \
-                        .replace('.', '') \
-                        .replace(',', '') \
-                        .replace('!', '') \
-                        .replace('?', '') \
-                        .replace('  ', ' ').split(' ')
+                    line = clear_text(line)
                     for word in line:
                         if len(word) > 3:
                             WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
@@ -185,7 +184,6 @@ def index(request):
 
             line_count = 1
             for el in wookbook.worksheets:
-                print(el)
                 for i in range(0, el.max_row):
                     line = ''
                     for col in el.iter_cols(1, el.max_column):
@@ -193,16 +191,9 @@ def index(request):
                             box = str(col[i].value) + ' '
                             line += box
                     line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
-                    line = line.strip() \
-                        .replace('\t', '') \
-                        .replace('.', '') \
-                        .replace(',', '') \
-                        .replace('!', '') \
-                        .replace('?', '') \
-                        .replace('  ', ' ').split(' ')
+                    line = clear_text(line)
                     for word in line:
                         if len(word) > 3:
-                            print(word)
                             WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
                     line_count += 1
             render(request, "main/index.html", {"doc_path": doc_path})
@@ -225,17 +216,10 @@ def index(request):
                         line += item + ' '
                     line_count += 1
                     line_of_doc = LineOfDoc.objects.create(text=line.strip(), doc=document, line_number=line_count)
-                    line = line.strip() \
-                        .replace('\t', '') \
-                        .replace('.', '') \
-                        .replace(',', '') \
-                        .replace('!', '') \
-                        .replace('?', '') \
-                        .replace('  ', ' ').split(' ')
+                    line = clear_text(line)
 
                     for word in line:
                         if len(word) > 3:
-                            print(word)
                             WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
 
             render(request, "main/index.html", {"doc_path": doc_path})
