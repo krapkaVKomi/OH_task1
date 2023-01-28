@@ -12,7 +12,6 @@ from django.http import HttpResponseBadRequest, JsonResponse
 from PyPDF2 import PdfReader
 from datetime import datetime
 from xlrd import open_workbook
-import comtypes.client
 import json
 import docx
 import csv
@@ -133,8 +132,9 @@ def index(request):
 
             line_count = 1
             for line in lines:
-                words = clear_text(line)
+                line = line.replace(';', '')
                 line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
+                words = clear_text(line)
                 for word in words:
                     WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
                 line_count += 1
@@ -352,9 +352,3 @@ def user_logout(request):
     logout(request)
     return redirect('/')
 
-
-
-class TaskList(View):
-
-    def get(self, request):
-        return render(request, 'main/test.html')
