@@ -12,7 +12,7 @@ from django.http import HttpResponseBadRequest, JsonResponse
 from PyPDF2 import PdfReader
 from datetime import datetime
 from xlrd import open_workbook
-import aspose.words as aw
+import comtypes.client
 import json
 import docx
 import csv
@@ -31,7 +31,7 @@ def encoding(path):
 
 
 def clear_text(line):
-    new_line = line.strip() \
+    new_line = str(line).strip() \
         .replace('\t', '') \
         .replace('.', '') \
         .replace(',', '') \
@@ -91,17 +91,10 @@ def index(request):
             render(request, "main/index.html", {"doc_path": doc_path})
             return redirect('/')
 
-        elif doc_type == 'docx' or doc_type == 'doc':
+        elif doc_type == 'docx':
             doc_file = File.objects.create(name=doc.name, file=doc)
             doc_path = doc_file.file.path
             document = Doc.objects.create(name=doc_name, link=doc_path)
-
-            if doc_type == 'doc':
-                doc = aw.Document(doc_path)
-                doc_path = doc_path.split('\\')
-                doc_path[-1] = f"{doc_name}.docx"
-                doc_path = '/'.join(doc_path)
-                doc.save(doc_path)
 
             doc = docx.Document(doc_path)
             line_count = 1
@@ -153,8 +146,8 @@ def index(request):
             doc_file = File.objects.create(name=doc.name, file=doc)
             doc_path = doc_file.file.path
             document = Doc.objects.create(name=doc_name, link=doc_path)
-            reader = PdfReader(doc_path)
 
+            reader = PdfReader(doc_path)
             number_of_pages = len(reader.pages)
             for i in range(number_of_pages):
                 page = reader.pages[i]
@@ -175,22 +168,23 @@ def index(request):
             doc_file = File.objects.create(name=doc.name, file=doc)
             doc_path = doc_file.file.path
             document = Doc.objects.create(name=doc_name, link=doc_path)
-            wookbook = openpyxl.load_workbook(doc_path)
-
             line_count = 1
-            for el in wookbook.worksheets:
-                for i in range(0, el.max_row):
-                    line = ''
-                    for col in el.iter_cols(1, el.max_column):
-                        if col[i].value != None:
-                            box = str(col[i].value) + ' '
-                            line += box
-                    line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
-                    line = clear_text(line)
-                    for word in line:
-                        if len(word) > 3:
-                            WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
-                    line_count += 1
+            wb_obj = openpyxl.load_workbook(doc_path)
+            sheets = wb_obj.worksheets
+            for sheet_obj in sheets:
+                max_col = sheet_obj.max_column
+                max_row = sheet_obj.max_row
+                for i in range(1, max_col + 1):
+                    for j in range(1, max_row + 1):
+                        cell_obj = sheet_obj.cell(row=j, column=i)
+                        line = cell_obj.value
+                        if line:
+                            line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
+                            line = clear_text(line)
+                            for word in line:
+                                if len(word) > 3:
+                                    WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
+                            line_count += 1
             render(request, "main/index.html", {"doc_path": doc_path})
             return redirect('/')
 
@@ -358,3 +352,9 @@ def user_logout(request):
     logout(request)
     return redirect('/')
 
+
+
+class TaskList(View):
+
+    def get(self, request):
+        return render(request, 'main/test.html')
