@@ -17,6 +17,8 @@ class Doc(models.Model):
     name = models.CharField(max_length=100, verbose_name='Name', null=True)
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Updated at')
     link = models.CharField(max_length=150, verbose_name='Storage location', blank=True)
+    word_table = models.CharField(max_length=100, verbose_name='Word table', null=True)
+    line_table = models.CharField(max_length=100, verbose_name='Line table', null=True)
 
     def __str__(self):
         return self.name

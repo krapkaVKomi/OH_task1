@@ -9,6 +9,7 @@ from django.contrib import messages
 from .forms import UserLoginForm, NameForm
 from chardet.universaldetector import UniversalDetector
 from django.http import HttpResponseBadRequest, JsonResponse
+from django.db import connection
 from PyPDF2 import PdfReader
 from datetime import datetime
 from xlrd import open_workbook
@@ -67,10 +68,12 @@ def index(request):
                 doc_name = doc_name + ' (' + str(datetime.now()) + ')'
                 break
 
+        errors = []
+
         if doc_type == 'txt':
             doc_file = File.objects.create(name=doc.name, file=doc)
             doc_path = doc_file.file.path
-            document = Doc.objects.create(name=doc_name, link=doc_path)
+            document = Doc.objects.create(name=doc_name, link=doc_path, word_table='Word' + str(doc_file.id))
             encod = encoding(path=doc_path)
             with open(doc_path, 'r', encoding=encod) as txt:
                 line_count = 1
@@ -81,12 +84,21 @@ def index(request):
                         word = word.strip()
                         if len(word) > 3:
                             words_of_line.append(word)
+                    try:
+                        line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
+                    except:
+                        errors.append(line)
+                        line_count += 1
+                        continue
 
-                    line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
                     line_count += 1
                     line = line.split(' ')
                     for word in line:
-                        WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
+                        try:
+                            WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
+                        except:
+                            errors.append(word)
+                            continue
             render(request, "main/index.html", {"doc_path": doc_path})
             return redirect('/')
 
@@ -108,13 +120,21 @@ def index(request):
                     word = word.strip()
                     if len(word) > 3:
                         words_of_line.append(word)
+                try:
+                    line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
+                except:
+                    line_count += 1
+                    errors.append(line)
+                    continue
 
-                line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
                 line_count += 1
                 line = line.split(' ')
                 for word in line:
-                    WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
-
+                    try:
+                        WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
+                    except:
+                        errors.append(word)
+                        continue
             render(request, "main/index.html", {"doc_path": doc_path})
             return redirect('/')
 
@@ -133,10 +153,20 @@ def index(request):
             line_count = 1
             for line in lines:
                 line = line.replace(';', '')
-                line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
+                try:
+                    line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
+                except:
+                    line_count += 1
+                    errors.append(line)
+                    continue
+
                 words = clear_text(line)
                 for word in words:
-                    WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
+                    try:
+                        WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
+                    except:
+                        errors.append(word)
+                        continue
                 line_count += 1
 
             render(request, "main/index.html", {"doc_path": doc_path})
@@ -154,12 +184,21 @@ def index(request):
                 lines_of_page = page.extract_text().split('\n')
                 line_count = 1
                 for line in lines_of_page:
-                    line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
+                    try:
+                        line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
+                    except:
+                        line_count += 1
+                        errors.append(line)
+                        continue
                     line_count += 1
                     line = clear_text(line)
                     for word in line:
                         if len(word) > 3:
-                            WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
+                            try:
+                                WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
+                            except:
+                                errors.append(word)
+                                continue
 
             render(request, "main/index.html", {"doc_path": doc_path})
             return redirect('/')
@@ -179,11 +218,21 @@ def index(request):
                         cell_obj = sheet_obj.cell(row=j, column=i)
                         line = cell_obj.value
                         if line:
-                            line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
+                            try:
+                                line_of_doc = LineOfDoc.objects.create(text=line, doc=document, line_number=line_count)
+                            except:
+                                line_count += 1
+                                errors.append(line)
+                                continue
+
                             line = clear_text(line)
                             for word in line:
                                 if len(word) > 3:
-                                    WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
+                                    try:
+                                        WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
+                                    except:
+                                        errors.append(word)
+                                        continue
                             line_count += 1
             render(request, "main/index.html", {"doc_path": doc_path})
             return redirect('/')
@@ -198,19 +247,26 @@ def index(request):
             for s in wb.sheets():
                 for row in range(s.nrows):
                     line = ''
-                    line_count = 1
+                    line_count = 0
                     for col in range(s.ncols):
                         items = s.cell(row, col).value
                         item = ''.join(str(items).replace('\n', ' '))
                         line += item + ' '
                     line_count += 1
-                    line_of_doc = LineOfDoc.objects.create(text=line.strip(), doc=document, line_number=line_count)
+                    try:
+                        line_of_doc = LineOfDoc.objects.create(text=line.strip(), doc=document, line_number=line_count)
+                    except:
+                        errors.append(line)
+                        continue
                     line = clear_text(line)
 
                     for word in line:
                         if len(word) > 3:
-                            WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
-
+                            try:
+                                WordOfDoc.objects.create(text=word, line=line_of_doc, doc=document)
+                            except:
+                                errors.append(word)
+                                continue
             render(request, "main/index.html", {"doc_path": doc_path})
             return redirect('/')
 
