@@ -13,8 +13,9 @@ from xlrd import open_workbook
 import docx
 import csv
 import openpyxl
-from django.shortcuts import render
+
 from django.http import JsonResponse
+import logging
 
 
 
@@ -394,9 +395,16 @@ def register(request):
 
 def my_view(request):
     if request.method == 'POST':
-        current_datetime = request.POST.get('currentDateTime')
-        print(current_datetime)
-        data = {'message': 'Request received!'}
+        test_input = request.POST.get('testInput')  # Read value of text input
+        if len(test_input) < 10:
+            logging.warning('Received text input is too short')
+            data = {'error': 'Please enter a text with at least 10 characters!'}
+        else:
+            num_chars = len(test_input)
+            shifted_input = test_input[num_chars - 10:] + test_input[:num_chars - 10]
+            logging.info(f'Received test input: {test_input}')
+            logging.info(f'Shifted test input: {shifted_input}')
+            data = {'message': 'Request received!', 'shiftedInput': shifted_input}
         return JsonResponse(data)
     else:
         return render(request, 'main/test.html')

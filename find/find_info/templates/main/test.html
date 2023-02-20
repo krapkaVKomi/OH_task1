@@ -6,18 +6,22 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $('#my-button').click(function() {
-                var currentDateTime = new Date();
+                var testInput = $('#test-input').val();
                 $.ajax({
                     url: '/test/',
                     type: 'POST',
                     headers: {
-                        'X-CSRFToken': '{{ csrf_token }}'  // Include CSRF token in headers
+                        'X-CSRFToken': '{{ csrf_token }}'
                     },
                     data: {
-                        'currentDateTime': currentDateTime.toLocaleString()
+                        'testInput': testInput
                     },
                     success: function(data) {
-                        $('#result').text(data.message);
+                        if (data.error) {
+                            $('#result').text(data.error);  // Display error message
+                        } else {
+                            $('#result').text(data.message + ' ' + data.shiftedInput);  // Display shifted input
+                        }
                     }
                 });
             });
@@ -26,8 +30,9 @@
 </head>
 <body>
     <h1>Button Demo</h1>
+    <input type="text" id="test-input">
     <button id="my-button">Click me!</button>
     <p id="result"></p>
-    <div style="display: none">{% csrf_token %}</div>  <!-- Add CSRF token inside a div -->
+    <div style="display: none">{% csrf_token %}</div>
 </body>
 </html>
