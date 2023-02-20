@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-from django.views.generic import View
 from .models import *
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth import login, logout
@@ -8,15 +7,16 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from .forms import UserLoginForm, NameForm
 from chardet.universaldetector import UniversalDetector
-from django.http import HttpResponseBadRequest, JsonResponse
-from django.db import connection
 from PyPDF2 import PdfReader
 from datetime import datetime
 from xlrd import open_workbook
-import json
 import docx
 import csv
 import openpyxl
+from django.shortcuts import render
+from django.http import JsonResponse
+
+
 
 
 def encoding(path):
@@ -390,6 +390,16 @@ def register(request):
     else:
         form = UserCreationForm()
     return render(request, 'main/register.html', {"form": form})
+
+
+def my_view(request):
+    if request.method == 'POST':
+        current_datetime = request.POST.get('currentDateTime')
+        print(current_datetime)
+        data = {'message': 'Request received!'}
+        return JsonResponse(data)
+    else:
+        return render(request, 'main/test.html')
 
 
 def user_login(request):

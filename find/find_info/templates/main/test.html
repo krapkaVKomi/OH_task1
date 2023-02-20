@@ -1,90 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-            crossorigin="anonymous">
-
+    <title>Button Demo</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#my-button').click(function() {
+                var currentDateTime = new Date();
+                $.ajax({
+                    url: '/test/',
+                    type: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'  // Include CSRF token in headers
+                    },
+                    data: {
+                        'currentDateTime': currentDateTime.toLocaleString()
+                    },
+                    success: function(data) {
+                        $('#result').text(data.message);
+                    }
+                });
+            });
+        });
     </script>
 </head>
 <body>
-<div class="container">
-  <h1>Todos</h1>
-
-  <hr><br><br>
-
-  <div class="row">
-    <div class="col">
-      <div class="header">
-        <h2>GET</h2>
-      </div>
-      <button class="btn btn-primary" id="getTodos">Read</button>
-      <p><ul id="todoList"></ul></p>
-    </div>
-
-    <div class="col">
-      <div class="header">
-        <h2>POST</h2>
-      </div>
-
-      <form id="addTodoForm" method="post">
-        {% csrf_token %}
-        <div class="mb-3">
-          <label for="todoTaskPost">Task</label>
-          <input name="test" type="text" class="form-control" id="todoTaskPost" placeholder="Task" required>
-        </div>
-
-        <button type="submit" class="btn btn-success">Create</button>
-      </form>
-
-    </div>
-  </div>
-
-  <br>
-
-
-
-{% block javascript %}
-<script>
-  // fetch api examples
-  (function() {
-
-    console.log("ready!");
-
-    const allTodosUrl = "{% url 'todos' %}";
-
-     // GET all todos
-    const readButton = document.getElementById("getTodos");
-    readButton.addEventListener("click", () => {
-      
-      console.log(allTodosUrl);
-      getAllTodos(allTodosUrl);
-    });
-
-    // POST
-    const addTodoForm = document.getElementById("addTodoForm");
-    addTodoForm.addEventListener("submit", (e) => {
-      // prevent page reload
-      e.preventDefault();
-      // get the values from the form fields
-      const formData = {
-        task: addTodoForm.elements["todoTaskPost"].value,
-      }
-
-      addTodo(allTodosUrl, formData);
-      addTodoForm.reset();
-    });
-      })();
-
-</script>
-{% endblock %}
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
-  </div>
+    <h1>Button Demo</h1>
+    <button id="my-button">Click me!</button>
+    <p id="result"></p>
+    <div style="display: none">{% csrf_token %}</div>  <!-- Add CSRF token inside a div -->
 </body>
 </html>
