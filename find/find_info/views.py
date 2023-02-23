@@ -396,18 +396,17 @@ def register(request):
 def my_view(request):
     if request.method == 'POST':
         test_input = request.POST.get('testInput')  # Read value of text input
+        print(test_input)
         if len(test_input) < 10:
-            logging.warning('Received text input is too short')
             data = {'error': 'Please enter a text with at least 10 characters!'}
         else:
             num_chars = len(test_input)
             shifted_input = test_input[num_chars - 10:] + test_input[:num_chars - 10]
-            logging.info(f'Received test input: {test_input}')
-            logging.info(f'Shifted test input: {shifted_input}')
             data = {'message': 'Request received!', 'shiftedInput': shifted_input}
         return JsonResponse(data)
     else:
         return render(request, 'main/test.html')
+
 
 
 def user_login(request):
