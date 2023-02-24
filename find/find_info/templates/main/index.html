@@ -13,6 +13,34 @@
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
             crossorigin="anonymous"></script>
 
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#your_name').on('input', function() {
+                var testInput = $('#your_name').val();
+
+                $.ajax({
+                    url: '/test/',
+                    type: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    data: {
+                        'testInput': testInput
+                    },
+                    success: function(data) {
+                        if (data.error) {
+                            $('#result').text(data.error);  // Display error message id="your_name"
+                        } else {
+                            $('#result').text(data.message + ' ' + data.shiftedInput);  // Display shifted input
+                            $('#my-button').prop('disabled', false);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
 </head>
 <body>
 
@@ -130,7 +158,9 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-success">Submit</button>
+                            <button type="submit" class="btn btn-success" id="my-button" disabled>Submit</button>
+                            <p id="result"></p>
+                            <div style="display: none">{% csrf_token %}</div>
                         </div>
                     </form>
                 </div>

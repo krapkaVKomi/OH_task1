@@ -395,14 +395,18 @@ def register(request):
 
 def my_view(request):
     if request.method == 'POST':
+        doc_names = []
+        docs = Doc.objects.all()
+        for item in docs:
+            doc_names.append(item.name)
         test_input = request.POST.get('testInput')  # Read value of text input
         print(test_input)
-        if len(test_input) < 10:
-            data = {'error': 'Please enter a text with at least 10 characters!'}
+        if test_input in doc_names:
+            data = {'error': 'This file name is already used, try another one!'}
         else:
             num_chars = len(test_input)
             shifted_input = test_input[num_chars - 10:] + test_input[:num_chars - 10]
-            data = {'message': 'Request received!', 'shiftedInput': shifted_input}
+            data = {'message': 'We can read and download your file!', 'shiftedInput': shifted_input}
         return JsonResponse(data)
     else:
         return render(request, 'main/test.html')
