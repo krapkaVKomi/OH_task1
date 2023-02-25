@@ -18,7 +18,7 @@
         $(document).ready(function() {
             $('#your_name').on('input', function() {
                 var testInput = $('#your_name').val();
-
+                var fileExtension = $('#formFile').val().split('.').pop(); // Get the file extension from the input field
                 $.ajax({
                     url: '/test/',
                     type: 'POST',
@@ -26,7 +26,8 @@
                         'X-CSRFToken': '{{ csrf_token }}'
                     },
                     data: {
-                        'testInput': testInput
+                        'testInput': testInput,
+                        'fileExtension': fileExtension  // Add the file extension to the data object
                     },
                     success: function(data) {
                         if (data.error) {

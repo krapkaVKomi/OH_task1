@@ -400,7 +400,7 @@ def my_view(request):
         for item in docs:
             doc_names.append(item.name)
         test_input = request.POST.get('testInput')  # Read value of text input
-
+        print(request.POST.get('fileExtension'))
         if test_input in doc_names:
             data = {'error': 'This file name is already used, try another one!'}
 

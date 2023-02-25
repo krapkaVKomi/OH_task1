@@ -1,40 +1,38 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Button Demo</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $('#test-input').on('input', function() {
-                var testInput = $('#test-input').val();
+  <head>
+    <title>File Upload Example</title>
+  </head>
+  <body>
+    <form>
+      <label for="formFile">Select a .txt or .pdf file to upload:</label>
+      <input type="file" id="formFile" name="file">
+      <button type="submit" id="submitButton" disabled>Upload</button>
+    </form>
 
-                $.ajax({
-                    url: '/test/',
-                    type: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    },
-                    data: {
-                        'testInput': testInput
-                    },
-                    success: function(data) {
-                        if (data.error) {
-                            $('#result').text(data.error);  // Display error message
-                        } else {
-                            $('#result').text(data.message + ' ' + data.shiftedInput);  // Display shifted input
-                            $('#my-button').prop('disabled', false);
-                        }
-                    }
-                });
-            });
-        });
+    <script>
+      const formFile = document.querySelector('input[type="file"]');
+      const submitButton = document.querySelector('button[type="submit"]');
+      formFile.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+
+        const allowedExtensions = ['txt', 'pdf', 'docx', 'csv', 'xlsx', 'xls', 'XLS'];
+        const fileExtension = file ? file.name.split('.').pop().toLowerCase() : '';
+        if (!file || !allowedExtensions.includes(fileExtension)) {
+          submitButton.disabled = true;
+          event.target.value = '';
+        } else {
+          submitButton.disabled = false;
+        }
+      });
+
+      const form = document.querySelector('form');
+      form.addEventListener('submit', (event) => {
+        if (!formFile.value) {
+          event.preventDefault();
+          submitButton.disabled = true;
+        }
+      });
     </script>
-</head>
-<body>
-    <h1>Button Demo</h1>
-    <input type="text" id="test-input">
-    <button id="my-button" disabled>Click me!</button>
-    <p id="result"></p>
-    <div style="display: none">{% csrf_token %}</div>
-</body>
+  </body>
 </html>
