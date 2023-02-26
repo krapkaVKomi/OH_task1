@@ -14,33 +14,62 @@
             crossorigin="anonymous"></script>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $('#your_name').on('input', function() {
-                var testInput = $('#your_name').val();
-                var fileExtension = $('#formFile').val().split('.').pop(); // Get the file extension from the input field
-                $.ajax({
-                    url: '/test/',
-                    type: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    },
-                    data: {
-                        'testInput': testInput,
-                        'fileExtension': fileExtension  // Add the file extension to the data object
-                    },
-                    success: function(data) {
-                        if (data.error) {
-                            $('#result').text(data.error);  // Display error message id="your_name"
-                        } else {
-                            $('#result').text(data.message + ' ' + data.shiftedInput);  // Display shifted input
-                            $('#my-button').prop('disabled', false);
-                        }
+<script type="text/javascript">
+    $(document).ready(function() {
+        // Add event listener for text input field
+        $('#your_name').on('input', function() {
+            var testInput = $('#your_name').val();
+            var fileExtension = $('#formFile').val().split('.').pop(); // Get the file extension from the input field
+
+            $.ajax({
+                url: '/test/',
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                data: {
+                    'testInput': testInput,
+                    'fileExtension': fileExtension
+                },
+                success: function(data) {
+                    if (data.error) {
+                        $('#result').text(data.error);
+                        $('#my-button').prop('disabled', true);
+                    } else {
+                        $('#result').text(data.message + ' ' + data.shiftedInput);
+                        $('#my-button').prop('disabled', false);
                     }
-                });
+                }
             });
         });
-    </script>
+
+        // Add event listener for file input field
+        $('#formFile').on('change', function() {
+            var fileExtension = $(this).val().split('.').pop();
+
+            $.ajax({
+                url: '/test/',
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                data: {
+                    'fileExtension': fileExtension
+                },
+                success: function(data) {
+                    if (data.error) {
+                        $('#result').text(data.error);
+                        $('#my-button').prop('disabled', true);
+                    } else {
+                        $('#result').text(data.message);
+                        $('#my-button').prop('disabled', false);
+                    }
+                }
+            });
+        });
+    });
+</script>
+
 
 </head>
 <body>

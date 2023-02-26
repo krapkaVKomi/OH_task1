@@ -399,20 +399,30 @@ def my_view(request):
         docs = Doc.objects.all()
         for item in docs:
             doc_names.append(item.name)
-        test_input = request.POST.get('testInput')  # Read value of text input
-        print(request.POST.get('fileExtension'))
-        if test_input in doc_names:
+
+        test_input = request.POST.get('testInput')
+        test_input = str(test_input)
+        file_extension = request.POST.get('fileExtension')
+
+        if not file_extension:
+            data = {'error': 'upload your file!'}
+
+        elif file_extension not in ['txt', 'pdf', 'csv', 'docx', 'xlsx', 'xls', 'XLS']:
+            data = {'error': 'We cannot read the file of this extension!'}
+
+        elif test_input in doc_names:
             data = {'error': 'This file name is already used, try another one!'}
 
         elif len(test_input) > 50:
             data = {'error': 'The file name is too long!'}
+
         else:
             num_chars = len(test_input)
             shifted_input = test_input[num_chars - 10:] + test_input[:num_chars - 10]
             data = {'message': 'We can read and download your file!', 'shiftedInput': shifted_input}
+
         return JsonResponse(data)
-    else:
-        return render(request, 'main/test.html')
+
 
 
 def user_login(request):
