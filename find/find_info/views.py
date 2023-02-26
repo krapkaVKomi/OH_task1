@@ -5,6 +5,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
+from django.http import JsonResponse
 from .forms import UserLoginForm, NameForm
 from chardet.universaldetector import UniversalDetector
 from PyPDF2 import PdfReader
@@ -13,11 +14,6 @@ from xlrd import open_workbook
 import docx
 import csv
 import openpyxl
-
-from django.http import JsonResponse
-import logging
-
-
 
 
 def encoding(path):
@@ -112,9 +108,6 @@ def index(request):
             line_count = 1
             for i in range(len(doc.paragraphs)):
                 line = doc.paragraphs[i].text
-                if doc_type == 'doc' and line_count == 1:
-                    line_count += 1
-                    continue
                 words = clear_text(line)
                 words_of_line = []
                 for word in words:
@@ -407,6 +400,9 @@ def my_view(request):
         if not file_extension:
             data = {'error': 'upload your file!'}
 
+        elif not test_input:
+            data = {'error': 'Add name for your file!'}
+
         elif file_extension not in ['txt', 'pdf', 'csv', 'docx', 'xlsx', 'xls', 'XLS']:
             data = {'error': 'We cannot read the file of this extension!'}
 
@@ -422,7 +418,6 @@ def my_view(request):
             data = {'message': 'We can read and download your file!', 'shiftedInput': shifted_input}
 
         return JsonResponse(data)
-
 
 
 def user_login(request):
